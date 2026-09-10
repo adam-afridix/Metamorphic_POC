@@ -1,0 +1,332 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #F8F9F7;
+    color: #1F2933;
+}
+
+
+/* ---------------- NAVBAR ---------------- */
+
+.navbar {
+    height: 70px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E4E7EC;
+
+    display: flex;
+    align-items: center;
+    padding: 0 7%;
+
+    gap: 50px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #287D7A;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    flex: 1;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #667085;
+    font-size: 14px;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #287D7A;
+}
+
+.profile-btn {
+    background: #F1EFF8;
+    color: #7467A8;
+
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+/* ---------------- MAIN ---------------- */
+
+.container {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 50px 25px;
+}
+
+
+/* ---------------- WELCOME ---------------- */
+
+.welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 35px;
+}
+
+.eyebrow {
+    color: #287D7A;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #667085;
+    font-size: 15px;
+}
+
+.primary-btn {
+    background: #287D7A;
+    color: #FFFFFF;
+
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    opacity: 0.9;
+}
+
+
+/* ---------------- CARDS ---------------- */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+
+    margin-bottom: 25px;
+}
+
+.card {
+    background: #FFFFFF;
+    border: 1px solid #E4E7EC;
+    border-radius: 12px;
+
+    padding: 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.teal-card {
+    background: #EAF5F4;
+    border-color: #EAF5F4;
+}
+
+.purple-card {
+    background: #F1EFF8;
+    border-color: #F1EFF8;
+}
+
+.card-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #FFFFFF;
+    color: #287D7A;
+
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.purple-card .card-icon {
+    color: #7467A8;
+}
+
+.neutral-icon {
+    color: #667085;
+}
+
+.card-label {
+    color: #667085;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.card h2 {
+    font-size: 25px;
+}
+
+
+/* ---------------- CONTENT ---------------- */
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.panel {
+    background: #FFFFFF;
+    border: 1px solid #E4E7EC;
+    border-radius: 12px;
+
+    padding: 25px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.panel h3 {
+    font-size: 17px;
+}
+
+.panel-header a {
+    color: #287D7A;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+
+/* ---------------- ACTIVITY ---------------- */
+
+.activity {
+    display: flex;
+    gap: 14px;
+
+    padding: 17px 0;
+    border-bottom: 1px solid #E4E7EC;
+}
+
+.activity:last-child {
+    border-bottom: none;
+}
+
+.activity-dot {
+    width: 10px;
+    height: 10px;
+
+    margin-top: 5px;
+    border-radius: 50%;
+
+    flex-shrink: 0;
+}
+
+.teal-dot {
+    background: #287D7A;
+}
+
+.purple-dot {
+    background: #7467A8;
+}
+
+.gray-dot {
+    background: #667085;
+}
+
+.activity strong {
+    font-size: 14px;
+}
+
+.activity p {
+    color: #667085;
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+.activity span {
+    color: #667085;
+    font-size: 11px;
+}
+
+
+/* ---------------- QUICK ACTIONS ---------------- */
+
+.quick-panel h3 {
+    margin-bottom: 20px;
+}
+
+.action {
+    width: 100%;
+
+    padding: 13px;
+    margin-bottom: 12px;
+
+    border-radius: 8px;
+    border: 1px solid #E4E7EC;
+
+    text-align: left;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.teal-action {
+    background: #EAF5F4;
+    color: #287D7A;
+}
+
+.purple-action {
+    background: #F1EFF8;
+    color: #7467A8;
+}
+
+.neutral-action {
+    background: #FFFFFF;
+    color: #1F2933;
+}
+
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 800px) {
+
+    .navbar {
+        padding: 0 25px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .welcome {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}

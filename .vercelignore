@@ -1,0 +1,15 @@
+# Keep the deployment upload lean — none of this is needed to build the app.
+BS-FYP-Handbook-2026_DRAFT.pdf
+proposal.png
+proposal-slides.html
+proposal-slides.pptx
+testpage.html
+architecture.mmd
+architecture-sequence.mmd
+ARCHITECTURE.md
+README.md
+description of fyp.txt
+fyp_extract.txt
+data_work
+scripts
+*.tsbuildinfo

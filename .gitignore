@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+.vercel
+*.local
+*.tsbuildinfo
+.DS_Store
+
+# generated / scratch
+fyp_extract.txt
+data_work/rows.json
+data_work/*.png
+scripts/*.png

@@ -1,0 +1,44 @@
+sequenceDiagram
+    autonumber
+    participant SEL as Adaptive Selection Agent
+    participant MEM as Testing Memory
+    participant VLM as Description model
+    participant LLM as Planner (LLM)
+    participant VAL as MR Validator
+    participant TE as Transformation Engine
+    participant IP2P as InstructPix2Pix
+    participant CLIP as Semantic Validator
+    participant M as CV model under test
+    participant ORA as Task-aware Oracle
+    participant FA as Failure Analyzer
+
+    MEM-->>SEL: failure profile, coverage, budget
+    SEL->>VLM: pick source image
+    VLM-->>CLIP: original text description
+    VLM-->>LLM: description
+    MEM-->>LLM: learned failure patterns
+    LLM->>LLM: choose relation + parameters
+    opt invents a new relation
+        LLM->>VAL: candidate MR
+        VAL-->>LLM: admitted / rejected
+    end
+    alt generative relation
+        LLM->>IP2P: image + edit instruction
+        IP2P-->>TE: edited test-case image
+    else deterministic relation
+        LLM->>TE: transform + parameters
+    end
+    TE-->>CLIP: test-case image
+    alt semantics not preserved
+        CLIP->>IP2P: regenerate (or fall back to code)
+    else preserved
+        CLIP->>M: original + test-case image
+        M-->>ORA: original output, transformed output
+        alt relation satisfied
+            ORA-->>MEM: PASS record
+        else violation
+            ORA->>FA: outputs + expected relation
+            FA-->>MEM: violation record (type, class, severity)
+        end
+    end
+    MEM-->>SEL: updated evidence -> next iteration

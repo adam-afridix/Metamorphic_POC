@@ -1,0 +1,1382 @@
+# Revised Project Description — Agentic Metamorphic Testing Framework for Computer Vision Models
+
+## 1. Project Overview
+
+Our FYP proposes a **general-purpose, domain-adaptive Agentic Metamorphic Testing (MT) Framework for Computer Vision (CV) models**.
+
+The framework is designed to test different types of CV models, including:
+
+* **Classification**
+* **Object Detection**
+* **Image Segmentation**
+* **Object Tracking**
+
+The user provides four primary inputs:
+
+1. **Trained CV model**
+2. **Model/task type**
+3. **Dataset**
+4. **Domain description**
+
+The addition of the **domain description** is important because the framework is not restricted to a fixed set of metamorphic relations. Instead, it combines a predefined library of general-purpose MRs with **LLM-generated generative, environmental, semantic, and domain-specific MRs** that are appropriate for the particular application.
+
+The overall system operates as an **adaptive closed-loop testing framework**: testing results are stored in memory, the accumulated evidence is analyzed, and an agent dynamically determines what should be tested next.
+
+---
+
+# 2. Overall Workflow
+
+The complete workflow is:
+
+```text
+                 USER INPUT
+                     │
+        ┌────────────┼─────────────┐
+        │            │             │
+      Model       Task Type     Dataset
+        │                          │
+        └────────────┬─────────────┘
+                     │
+              Domain Description
+                     │
+                     ▼
+          ┌─────────────────────┐
+          │   MODEL PROFILER    │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ INITIAL FAILURE     │
+          │ PROFILE             │
+          └──────────┬──────────┘
+                     │
+                     ▼
+          ┌─────────────────────┐
+          │   MR DISCOVERY      │
+          │       AGENT         │
+          └──────────┬──────────┘
+                     │
+       ┌─────────────┼──────────────┐
+       ▼             ▼              ▼
+  Base MRs      Generative /    Domain-specific
+   (21 MRs)     Environmental        MRs
+       │             MRs              │
+       └─────────────┼───────────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ MR CANDIDATE POOL   │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ MR VALIDATION &     │
+          │ COMPATIBILITY       │
+          │ CHECK                │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ INITIAL TESTING     │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │   TESTING MEMORY    │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ ADAPTIVE TEST       │
+          │ SELECTION AGENT     │
+          └──────────┬──────────┘
+                     │
+              Selects next:
+            image + MR + params
+                     │
+                     ▼
+          ┌─────────────────────┐
+          │ TRANSFORMATION      │
+          │ ENGINE              │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ SEMANTIC VALIDATION │
+          │ CLIP + constraints  │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │      CV MODEL       │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ TASK-SPECIFIC       │
+          │ MR ORACLE           │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ FAILURE ANALYZER    │
+          └──────────┬──────────┘
+                     ▼
+          ┌─────────────────────┐
+          │ UPDATE TESTING      │
+          │ MEMORY              │
+          └──────────┬──────────┘
+                     │
+                     └──────────────► ADAPTIVE AGENT
+                                           │
+                                           ▼
+                                      NEXT TEST
+```
+
+---
+
+# 3. User Input
+
+The framework accepts four major inputs.
+
+## 3.1 CV Model
+
+The user provides a trained computer vision model.
+
+The framework should use a **model adapter interface** so different model frameworks can be supported.
+
+For example:
+
+```text
+PyTorch
+TensorFlow
+ONNX
+Ultralytics
+Hugging Face
+```
+
+The POC can initially support a limited number of model formats.
+
+---
+
+## 3.2 Model Type
+
+The user specifies the task:
+
+```text
+Classification
+Detection
+Segmentation
+Tracking
+```
+
+This information is essential because the expected output relation and MR oracle are different for each task.
+
+For example, a rotation may mean:
+
+**Classification**
+
+```text
+cat → cat
+```
+
+**Detection**
+
+```text
+bounding boxes must rotate consistently
+```
+
+**Segmentation**
+
+```text
+segmentation mask must rotate consistently
+```
+
+**Tracking**
+
+```text
+object identity and trajectory must remain consistent
+```
+
+---
+
+# 4. Dataset
+
+The dataset contains the original test inputs and, where applicable, ground-truth annotations.
+
+Examples:
+
+### Classification
+
+```text
+image
+label
+```
+
+### Detection
+
+```text
+image
+bounding boxes
+class labels
+```
+
+### Segmentation
+
+```text
+image
+segmentation mask
+```
+
+### Tracking
+
+```text
+video/frame sequence
+object identities
+trajectories
+```
+
+---
+
+# 5. Domain Description
+
+The user also provides a **natural-language domain description**.
+
+For example:
+
+> "This is an autonomous driving object detection model that detects pedestrians, cars, cyclists, and traffic signs in urban road scenes. The model should remain robust under changes in weather, lighting, camera conditions, object appearance, and partial occlusion."
+
+The domain description is used by the MR Discovery Agent to understand:
+
+* what objects exist;
+* what environmental conditions matter;
+* which changes should preserve semantics;
+* which changes should alter the expected output;
+* what transformations are meaningful;
+* what transformations could be unsafe or invalid.
+
+This makes the framework **domain-adaptive rather than tied to one specific domain**.
+
+---
+
+# 6. Baseline Model Profiling
+
+Before metamorphic testing begins, the framework evaluates the model on the original dataset.
+
+The system calculates appropriate metrics.
+
+### Classification
+
+* Accuracy
+* Precision
+* Recall
+* F1
+* Per-class metrics
+* Confusion matrix
+* Confidence statistics
+
+### Detection
+
+* mAP
+* Precision
+* Recall
+* IoU
+* Per-class AP
+* Confidence statistics
+
+### Segmentation
+
+* IoU
+* Dice
+* Pixel accuracy
+* Per-class metrics
+
+### Tracking
+
+Depending on the selected implementation:
+
+* ID consistency
+* trajectory consistency
+* MOTA/MOTP where applicable
+* detection/association errors
+
+---
+
+# 7. Initial Failure Profile
+
+The profiler creates an initial **model failure profile**.
+
+For example:
+
+```text
+Overall performance
+        ↓
+Weak classes
+        ↓
+Common confusions
+        ↓
+Low-confidence classes
+        ↓
+Baseline error patterns
+```
+
+Example:
+
+```json
+{
+  "task": "detection",
+  "baseline_map": 0.91,
+  "weak_classes": [
+    "pedestrian",
+    "cyclist"
+  ],
+  "common_failures": [
+    "small objects",
+    "crowded scenes"
+  ],
+  "average_confidence": 0.78
+}
+```
+
+This profile becomes one of the inputs to the agentic testing process.
+
+---
+
+# 8. MR Discovery Agent
+
+This is a major part of the revised architecture.
+
+The framework does **not** assume that only the original 21 MRs can be tested.
+
+The 21 MRs form the **initial/general-purpose MR library**.
+
+The MR Discovery Agent receives:
+
+```text
+Domain Description
++
+Task Type
++
+Model characteristics
++
+Base MR Library
+```
+
+and generates an expanded MR candidate pool.
+
+The candidate pool consists of:
+
+```text
+1. Existing/general MRs
+2. Generative/environmental MRs
+3. Domain-specific MRs
+```
+
+---
+
+# 9. Base MR Library
+
+The initial library contains the agreed 21 MRs:
+
+### Photometric
+
+* BGR channel reorder
+* Contrast
+* Brightness
+* Blur
+* Sharpen
+* Random perturbation
+
+### Geometric
+
+* Rotation
+* Transpose
+* Rotation + transpose
+* Affine transformation
+* Translation
+* Enlarge
+* Shrink
+* Arbitrary rotation
+* Rotation + translation
+* Translation + shrink
+
+### Morphological
+
+* Erosion
+* Dilation
+* Dilation/erosion duality
+
+### Existing generative/environmental
+
+* Sunny → snowy
+
+These provide a standardized baseline.
+
+---
+
+# 10. Generative and Environmental MRs
+
+The framework extends beyond the original sunny → snowy transformation.
+
+The Generative MR layer can produce controlled visual variations such as:
+
+### Weather
+
+```text
+Sunny → Rainy
+Sunny → Snowy
+Clear → Foggy
+Clear → Cloudy
+Dry → Wet
+Normal → Stormy
+Clear → Hazy
+Light rain → Heavy rain
+```
+
+### Time and illumination
+
+```text
+Day → Night
+Day → Dawn
+Day → Dusk
+Bright → Dim
+Normal → Low-light
+Normal → Backlit
+Normal → Shadowed
+Warm → Cool illumination
+```
+
+### Environmental appearance
+
+```text
+Summer → Winter
+Green → Dry vegetation
+Dry road → Wet road
+Clean → Dusty
+Clear atmosphere → Hazy atmosphere
+Sparse → Crowded
+```
+
+### Camera and imaging conditions
+
+```text
+Normal exposure → Overexposure
+Normal exposure → Underexposure
+Clean lens → Dirty lens
+Normal image → Motion blur
+Normal image → Defocus
+Normal image → Sensor noise
+Normal image → Compression artifacts
+Normal image → Lens distortion
+Normal image → Glare
+Normal → Raindrops on lens
+```
+
+### Object appearance
+
+```text
+Object colour change
+Object texture change
+Object material change
+Clean → Dirty
+New → Worn
+Normal → Damaged
+```
+
+### Occlusion
+
+```text
+Visible object
+      ↓
+Partially occluded object
+```
+
+### Background
+
+```text
+Original background → Alternative background
+Urban background → Rural background
+Simple background → Complex background
+```
+
+### Object insertion
+
+```text
+Scene
+ ↓
+Scene + pedestrian
+```
+
+### Object removal
+
+```text
+Scene + vehicle
+ ↓
+Scene
+```
+
+### Object replacement
+
+```text
+Car → Truck
+```
+
+### Object position
+
+```text
+Object on left → Object on right
+```
+
+These transformations must be treated carefully because **not all of them should have an invariant output relation**.
+
+---
+
+# 11. Domain-Specific MR Generation
+
+The framework can additionally generate MRs based specifically on the supplied domain.
+
+For example:
+
+### Autonomous driving
+
+Potential MRs:
+
+```text
+Day → Night
+Clear → Rain
+Clear → Fog
+Pedestrian → partially occluded pedestrian
+Dry road → wet road
+Normal traffic → dense traffic
+```
+
+### Agriculture
+
+Potential MRs:
+
+```text
+Different illumination
+Leaf orientation
+Background changes
+Mild occlusion
+Leaf wetness
+Seasonal appearance
+```
+
+### Medical imaging
+
+Potential MRs might include:
+
+```text
+controlled contrast
+noise
+exposure
+acquisition variations
+```
+
+while carefully preserving medically relevant structures.
+
+The important principle is:
+
+> **The domain description does not simply tell the LLM what transformation to perform; it tells the LLM what properties should be preserved or changed when constructing an MR.**
+
+---
+
+# 12. MR Types
+
+The framework should support multiple types of metamorphic relations.
+
+## Type 1 — Invariant
+
+The transformation should not substantially change the prediction.
+
+$$
+O' \approx O
+$$
+
+Example:
+
+```text
+brightness change
+```
+
+---
+
+## Type 2 — Predictable Transformation
+
+The output changes according to a known transformation.
+
+$$
+O'=T(O)
+$$
+
+Example:
+
+```text
+image rotation
+```
+
+where detection bounding boxes or segmentation masks must rotate accordingly.
+
+---
+
+## Type 3 — Addition
+
+An object is inserted.
+
+$$
+O'=O+\Delta
+$$
+
+Example:
+
+```text
+insert pedestrian
+```
+
+---
+
+## Type 4 — Removal
+
+An object is removed.
+
+$$
+O'=O-\Delta
+$$
+
+---
+
+## Type 5 — Relational
+
+The relationship between original and transformed outputs must satisfy a defined condition.
+
+$$
+R(O,O')=True
+$$
+
+This is particularly useful for tracking and complex scene transformations.
+
+---
+
+# 13. MR Validation
+
+An important component is the **MR Validator**.
+
+An LLM-generated MR should not automatically become a valid test.
+
+The validator checks:
+
+```text
+MR schema
+       ↓
+Task compatibility
+       ↓
+Domain consistency
+       ↓
+Transformation feasibility
+       ↓
+Expected output relation
+       ↓
+Semantic preservation requirements
+```
+
+Invalid or ambiguous MRs are rejected or sent back for refinement.
+
+---
+
+# 14. MR Candidate Pool
+
+After discovery and validation, the framework maintains a candidate pool.
+
+Example:
+
+```text
+BASE
+MR-01
+MR-02
+...
+MR-21
+
+GENERATIVE
+GMR-01 Rain
+GMR-02 Fog
+GMR-03 Night
+GMR-04 Occlusion
+GMR-05 Background change
+...
+
+DOMAIN-SPECIFIC
+DMR-01 ...
+DMR-02 ...
+DMR-03 ...
+```
+
+The pool is therefore **dynamic rather than fixed**.
+
+---
+
+# 15. Initial Testing
+
+The framework initially selects a small number of source images.
+
+For example:
+
+```text
+10 representative images
+```
+
+The initial testing phase explores a subset of the available MR candidates.
+
+This establishes an initial metamorphic testing profile.
+
+The goal is not necessarily to exhaustively test every combination.
+
+---
+
+# 16. Adaptive Test Selection Agent
+
+Once initial tests have been performed, the system enters its main agentic loop.
+
+The Adaptive Test Selection Agent receives:
+
+```text
+Failure Profile
++
+Testing Memory
++
+MR Candidate Pool
++
+MR Failure Rates
++
+MR Coverage
++
+Previous Test Results
++
+Affected Classes
++
+Transformation Parameters
++
+Remaining Test Budget
+```
+
+It then selects:
+
+```text
+Source image
++
+MR
++
+Transformation parameters
+```
+
+Example:
+
+```json
+{
+  "source_image": "image_743",
+  "mr": "GMR-02",
+  "parameters": {
+    "fog_density": 0.7
+  },
+  "reason": "Fog has not been sufficiently explored and previous low-visibility tests caused pedestrian detection failures."
+}
+```
+
+This creates the **closed-loop agentic behaviour**.
+
+---
+
+# 17. Transformation Engine
+
+The selected MR is executed by deterministic transformation services.
+
+The LLM does **not** directly manipulate the image.
+
+For example:
+
+```text
+Agent:
+MR = Blur
+sigma = 3
+
+        ↓
+
+Transformation Engine:
+apply_blur(image, sigma=3)
+
+        ↓
+
+Transformed image
+```
+
+This makes the framework reproducible.
+
+---
+
+# 18. Generative Transformation
+
+For generative MRs:
+
+```text
+Source image
+     ↓
+Generative transformation
+     ↓
+Generated image
+```
+
+For example:
+
+```text
+Daytime scene
+       ↓
+Day → Night
+       ↓
+Generated nighttime scene
+```
+
+or:
+
+```text
+Clear road
+       ↓
+Clear → Fog
+       ↓
+Generated foggy road
+```
+
+The generative transformation service can be implemented through a pluggable image-generation/editing model.
+
+---
+
+# 19. Semantic Validation
+
+Generative transformations can unintentionally change objects or scene semantics.
+
+Therefore the transformed image is validated before model testing.
+
+The system can use:
+
+* CLIP;
+* image-text similarity;
+* object preservation checks;
+* spatial consistency;
+* task-specific constraints.
+
+For example:
+
+```text
+Original:
+1 car + 2 pedestrians
+
+Generated:
+1 car + 2 pedestrians
+
+Semantic validation:
+PASS
+```
+
+But:
+
+```text
+Original:
+1 car + 2 pedestrians
+
+Generated:
+1 car + 1 pedestrian
+
+Semantic validation:
+FAIL
+```
+
+The generated image can then be rejected or regenerated.
+
+---
+
+# 20. CV Model Execution
+
+Once the transformed image passes validation:
+
+```text
+Original image
+       ↓
+CV Model
+       ↓
+Original output
+
+Transformed image
+       ↓
+CV Model
+       ↓
+Transformed output
+```
+
+Both outputs are passed to the task-specific MR oracle.
+
+---
+
+# 21. Task-Specific MR Oracle
+
+The oracle determines whether the metamorphic relation was satisfied.
+
+## Classification
+
+Example:
+
+```text
+Original → Dog
+Transformed → Dog
+```
+
+PASS.
+
+---
+
+## Detection
+
+Transform the expected bounding boxes and compare against predicted boxes.
+
+$$
+IoU(B_{expected},B_{predicted})
+$$
+
+---
+
+## Segmentation
+
+Transform the expected mask and compare against the predicted mask.
+
+$$
+IoU(M_{expected},M_{predicted})
+$$
+
+or Dice.
+
+---
+
+## Tracking
+
+Compare:
+
+```text
+object identity
+trajectory
+position
+association consistency
+```
+
+between the original and transformed sequences.
+
+---
+
+# 22. Failure Analyzer
+
+When a violation occurs, the system records detailed information.
+
+Example:
+
+```json
+{
+  "image": "image_743",
+  "mr": "fog",
+  "parameter": 0.7,
+  "status": "FAIL",
+  "affected_class": "pedestrian",
+  "original_confidence": 0.91,
+  "transformed_confidence": 0.43,
+  "semantic_validation": 0.94
+}
+```
+
+The analyzer can categorize the failure as:
+
+```text
+confidence degradation
+class confusion
+object disappearance
+false positive
+false negative
+localization degradation
+segmentation degradation
+identity switch
+```
+
+depending on the task.
+
+---
+
+# 23. Testing Memory
+
+Every test becomes persistent evidence.
+
+The memory stores:
+
+```text
+Source image
+MR
+MR category
+Parameters
+Original output
+Transformed output
+Expected relation
+Actual relation
+PASS/FAIL
+Failure type
+Affected class
+Confidence
+Semantic similarity
+```
+
+It also maintains aggregate statistics:
+
+```text
+MR failure rate
+class failure rate
+parameter failure rate
+domain-condition failure rate
+MR coverage
+image coverage
+```
+
+---
+
+# 24. Closed-Loop Learning
+
+The most important part of the architecture is the feedback loop:
+
+```text
+             TEST
+              ↓
+           RESULT
+              ↓
+        PASS / FAILURE
+              ↓
+        FAILURE ANALYSIS
+              ↓
+           MEMORY
+              ↓
+       UPDATED PROFILE
+              ↓
+        AGENT REASONING
+              ↓
+          NEXT TEST
+              ↓
+             TEST
+```
+
+Therefore, the testing process becomes progressively **evidence-guided**.
+
+For example:
+
+```text
+Initial tests
+      ↓
+Agent discovers:
+blur causes pedestrian failures
+      ↓
+Memory updated
+      ↓
+Agent selects:
+different blur strengths
++
+images containing pedestrians
+      ↓
+More evidence
+      ↓
+Agent may discover:
+failure occurs only at high blur
+```
+
+This is much more informative than simply applying every transformation uniformly.
+
+---
+
+# 25. Stopping Conditions
+
+The framework should use configurable stopping criteria.
+
+Recommended:
+
+### Test budget
+
+```text
+Maximum 500 tests
+```
+
+### MR coverage
+
+```text
+Stop when required MR coverage is achieved
+```
+
+### Saturation
+
+Stop when new tests provide very little new information.
+
+### Time budget
+
+```text
+Run for X minutes
+```
+
+The POC can combine:
+
+$$
+Stop =
+Budget\ reached
+\lor
+Coverage\ achieved
+\lor
+Failure\ discovery\ saturation
+$$
+
+---
+
+# 26. Final Robustness Profile
+
+After testing, the framework generates a comprehensive report.
+
+Example:
+
+```text
+MODEL ROBUSTNESS REPORT
+────────────────────────────
+
+Baseline mAP:       0.91
+
+Metamorphic Tests:  500
+
+MR Violations:      73
+
+Violation Rate:     14.6%
+
+Most problematic MRs:
+
+1. Fog              31%
+2. Blur             29%
+3. Night            25%
+4. Occlusion        22%
+
+Most affected class:
+
+Pedestrian
+
+Most vulnerable conditions:
+
+• low visibility
+• heavy blur
+• nighttime
+• partial occlusion
+```
+
+---
+
+# 27. Production Readiness Assessment
+
+The framework can provide an evidence-based robustness assessment.
+
+However, it should **not claim that metamorphic testing proves production readiness**.
+
+Instead:
+
+```text
+Baseline Performance
+        +
+Metamorphic Robustness
+        +
+Failure Severity
+        +
+MR Coverage
+        +
+Domain Conditions
+        ↓
+Robustness Assessment
+```
+
+For example:
+
+```text
+Baseline performance: HIGH
+MR coverage:          HIGH
+Critical violations:  MEDIUM
+Generative robustness: LOW
+
+Assessment:
+⚠ Additional robustness testing recommended
+```
+
+---
+
+# 28. Technical Architecture
+
+The recommended POC architecture is:
+
+```text
+┌───────────────────────────────────────────────┐
+│                 USER INTERFACE                │
+│                                               │
+│ Model | Dataset | Task | Domain | Test Budget│
+└──────────────────────┬────────────────────────┘
+                       ↓
+┌───────────────────────────────────────────────┐
+│                 ORCHESTRATOR                  │
+└──────────────────────┬────────────────────────┘
+                       │
+          ┌────────────┼─────────────┐
+          ↓            ↓             ↓
+      Model        Dataset       Domain
+      Adapter      Manager       Parser
+          │            │             │
+          └────────────┼─────────────┘
+                       ↓
+              ┌────────────────┐
+              │ Model Profiler │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Failure Profile│
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ MR Discovery   │
+              │ Agent          │
+              └───────┬────────┘
+                      ↓
+        ┌─────────────┼──────────────┐
+        ↓             ↓              ↓
+     Base MRs    Generative      Domain MRs
+       21            MRs              MRs
+        └─────────────┼──────────────┘
+                      ↓
+              ┌────────────────┐
+              │ MR Validator   │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ MR Candidate   │
+              │ Pool           │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Testing Memory │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Adaptive Test  │
+              │ Agent          │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Transformation │
+              │ Engine         │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Semantic       │
+              │ Validator      │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ CV Model       │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ MR Oracle      │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Failure        │
+              │ Analyzer       │
+              └───────┬────────┘
+                      ↓
+              ┌────────────────┐
+              │ Update Memory  │
+              └───────┬────────┘
+                      │
+                      └──────────► Adaptive Agent
+```
+
+---
+
+# 29. Separation of Responsibilities
+
+A very important architectural principle is:
+
+| Component                    | Responsibility                                   |
+| ---------------------------- | ------------------------------------------------ |
+| **LLM / MR Discovery Agent** | Generate and reason about candidate MRs          |
+| **MR Validator**             | Check whether generated MRs are valid/applicable |
+| **Adaptive Agent**           | Select next image + MR + parameters              |
+| **Transformation Engine**    | Actually transform images                        |
+| **Generative Model**         | Generate/edit images                             |
+| **CLIP**                     | Semantic validation                              |
+| **CV Model**                 | Produce predictions                              |
+| **MR Oracle**                | Objectively determine MR satisfaction            |
+| **Failure Analyzer**         | Categorize failures                              |
+| **Memory**                   | Store historical evidence                        |
+| **Profiler**                 | Build/update robustness profile                  |
+| **Orchestrator**             | Coordinate the complete process                  |
+
+The LLM therefore **does not become the source of truth** for whether a test passed.
+
+The objective oracle determines that.
+
+---
+
+# 30. Core Innovation/Research Concept
+
+The conceptual contribution of the framework is not simply:
+
+> "Apply image transformations to a CV model."
+
+Instead, the proposed system combines:
+
+$$
+\boxed{
+\text{General MRs}
++
+\text{LLM-generated MRs}
++
+\text{Domain descriptions}
++
+\text{Generative transformations}
++
+\text{Task-aware oracles}
++
+\text{Semantic validation}
++
+\text{Testing memory}
++
+\text{Adaptive test selection}
+}
+$$
+
+into a **closed-loop agentic metamorphic testing framework**.
+
+The 21 existing MRs act as the **initial knowledge base**, while the LLM can extend the testing space through **generative/environmental and domain-specific MR discovery**.
+
+---
+
+# 31. One Important Terminology Change
+
+I would **not call the system "LLM generates unlimited MRs."**
+
+Instead, use:
+
+> **"LLM-assisted dynamic MR discovery and expansion."**
+
+Why?
+
+Because every generated MR must satisfy:
+
+```text
+Domain validity
++
+Task compatibility
++
+Expected relation
++
+Transformation feasibility
++
+Semantic constraints
+```
+
+before it becomes an executable test.
+
+That wording will make your research proposal much more technically defensible.
+
+---
+
+# 32. Final One-Paragraph Description
+
+> **We propose a general-purpose, domain-adaptive Agentic Metamorphic Testing Framework for Computer Vision models. The framework accepts a trained CV model, its task type, a dataset, and a natural-language domain description. It first evaluates the model on the original dataset to construct an initial failure profile. An MR Discovery Agent then combines a predefined library of 21 general-purpose metamorphic relations with generative/environmental transformations and new domain-specific MRs inferred from the supplied domain description. These candidate MRs are validated for task compatibility, semantic preservation, and executability before entering the MR candidate pool. The framework then performs an initial set of tests and stores all testing evidence in persistent memory. An Adaptive Test Selection Agent uses the failure profile, previous test outcomes, MR coverage, failure statistics, and domain information to dynamically select the next source image, MR, and transformation parameters. The selected transformation is executed by deterministic transformation or generative services, and generated images are validated using CLIP and task-specific semantic constraints. The original and transformed inputs are then evaluated by the CV model, and a task-specific metamorphic oracle objectively determines whether the expected relation is satisfied. Failures are analyzed and stored back into memory, creating a closed feedback loop in which each testing cycle informs the selection of subsequent tests. At the end, the framework produces an evidence-based robustness and failure profile identifying vulnerable classes, transformations, environmental conditions, and failure patterns, together with recommendations for further model improvement and testing.**

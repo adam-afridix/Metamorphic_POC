@@ -1,0 +1,112 @@
+%% Metamorph — full architecture / project flow
+%% Paste into https://mermaid.live , or render with the Mermaid CLI / a Markdown viewer.
+
+flowchart TD
+    U["User inputs<br/>model · task · dataset · domain · test budget"]:::io
+
+    %% ---------------- Phase 0 ----------------
+    subgraph P0["Phase 0 — Setup and baseline profiling"]
+        direction TB
+        ADP["Model Adapter<br/>PyTorch / ONNX / Ultralytics / HF"]:::det
+        PROF["Model Profiler<br/>metrics on the original dataset"]:::det
+        FP["Initial Failure Profile<br/>weak classes · common failures · avg confidence"]:::data
+        DOM["Domain Parser"]:::llm
+        COND["Relevant conditions<br/>weather · lighting · occlusion · camera"]:::data
+        ADP --> PROF --> FP
+        DOM --> COND
+    end
+
+    %% ---------------- Phase 1 ----------------
+    subgraph P1["Phase 1 — Bootstrap sweep"]
+        direction TB
+        SAMP["~10 sample images"]:::data
+        TE0["Transformation Engine<br/>base / general-purpose library"]:::det
+        OR0["Task-aware Oracle"]:::det
+        PAT["Sweep failure pattern"]:::data
+        SAMP --> TE0 --> OR0
+        OR0 --> PAT
+    end
+
+    %% ---------------- Discovery ----------------
+    subgraph DISC["Relation discovery and validation"]
+        direction TB
+        MRD["MR Discovery Agent (LLM)"]:::llm
+        BASE["Base MRs (21)"]:::data
+        GENM["Generative / environmental MRs<br/>rain · fog · night · dusk · haze · glare · motion blur"]:::data
+        DMRM["Domain-specific MRs<br/>occluded pedestrian · wet road · car to truck · insertion"]:::data
+        VAL["MR Validator<br/>schema · task · domain · feasibility · relation · semantics"]:::det
+        POOL["MR Candidate Pool"]:::data
+        MRD --> BASE
+        MRD --> GENM
+        MRD --> DMRM
+        BASE --> VAL
+        GENM --> VAL
+        DMRM --> VAL
+        VAL -- admitted --> POOL
+        VAL -- rejected --> MRD
+    end
+
+    %% ---------------- Phase 2: closed loop ----------------
+    subgraph LOOP["Phase 2 — Adaptive closed loop"]
+        direction TB
+        MEM[("Testing Memory<br/>image · relation · params · outputs · verdict ·<br/>failure type · class · confidences · CLIP sim ·<br/>aggregates: fail-rates · coverage")]:::mem
+        SEL["Adaptive Selection Agent (LLM / policy)"]:::llm
+        PICK["Pick source image"]:::det
+        DESC["Describe image<br/>vision model to text"]:::vlm
+        PLAN["Plan relation (LLM)<br/>choose or invent the next MR"]:::llm
+        GENQ{"Generative<br/>relation?"}:::dec
+        IP2P["InstructPix2Pix<br/>edit(image, instruction)"]:::gen
+        CODE["Deterministic transform<br/>OpenCV / code"]:::det
+        TC["Test-case image"]:::data
+        CLIPQ{"CLIP semantic check<br/>original text vs test image"}:::clip
+        RUN["Run CV model<br/>original and test case"]:::model
+        ORA["Verify — Task-aware Oracle<br/>invariant · predictable · addition · removal · relational"]:::det
+        PASS(["PASS"]):::pass
+        VIOL(["VIOLATION"]):::fail
+        FA["Failure Analyzer<br/>categorise the violation"]:::det
+
+        SEL --> PICK --> DESC --> PLAN --> GENQ
+        PLAN -. new MR .-> VAL
+        GENQ -- yes --> IP2P --> TC
+        GENQ -- no --> CODE --> TC
+        TC --> CLIPQ
+        CLIPQ -- not preserved --> IP2P
+        DESC -. original description .-> CLIPQ
+        CLIPQ -- preserved --> RUN --> ORA
+        ORA --> PASS
+        ORA --> VIOL --> FA
+        PASS --> MEM
+        FA --> MEM
+        MEM --> SEL
+    end
+
+    STOP{"Stop?<br/>budget · coverage · saturation · time"}:::dec
+    RPT["Model Robustness Report<br/>per condition · class · relation · coverage +<br/>assessment (not a production-readiness guarantee)"]:::io
+
+    %% ---------------- cross-phase edges ----------------
+    U --> ADP
+    U --> DOM
+    FP --> SAMP
+    OR0 --> MEM
+    FP --> MRD
+    COND --> MRD
+    PAT --> MRD
+    POOL --> SEL
+    FP --> SEL
+    MEM --> STOP
+    STOP -- no --> SEL
+    STOP -- yes --> RPT
+
+    %% ---------------- styling ----------------
+    classDef io fill:#e8eefc,stroke:#3550a0,color:#12203f;
+    classDef det fill:#eef2f7,stroke:#8a97a8,color:#1a1f26;
+    classDef data fill:#f6f7f9,stroke:#cfd4db,color:#5b6675;
+    classDef llm fill:#efeafc,stroke:#6a5acd,color:#3a2f7a;
+    classDef gen fill:#efeafc,stroke:#6a5acd,color:#3a2f7a;
+    classDef vlm fill:#efeafc,stroke:#6a5acd,color:#3a2f7a;
+    classDef clip fill:#fff3e0,stroke:#b9791a,color:#6b4a10;
+    classDef model fill:#e7f2ff,stroke:#2f6bff,color:#12356b;
+    classDef mem fill:#eef7f0,stroke:#1f9d63,color:#0f4a2e;
+    classDef pass fill:#e7f6ee,stroke:#1f9d63,color:#0f4a2e;
+    classDef fail fill:#fdeaea,stroke:#d6323a,color:#7a1c20;
+    classDef dec fill:#f5f6f8,stroke:#5b6675,color:#1a1f26;

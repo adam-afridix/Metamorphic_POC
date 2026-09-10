@@ -1,0 +1,1191 @@
+{
+ "source": "nateraw/kitti (KITTI Vision Benchmark) \u00b7 Hugging Face",
+ "license": "CC BY-NC-SA 3.0",
+ "domain": "autonomous driving",
+ "cases": [
+  {
+   "id": "IMG-01",
+   "src": 19,
+   "image": "dataset/IMG-01.jpg",
+   "transformedImage": "dataset/IMG-01_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "2 cars in an urban driving scene.",
+   "transformedCaption": "2 cars \u2014 brightness +42.",
+   "sceneSummary": "2 cars with ground-truth annotations.",
+   "mrId": "MR-03",
+   "transformName": "Brightness +42",
+   "transformStyle": "brightness",
+   "selectionReason": "Baseline scene is well-lit with clean, well-separated vehicles \u2014 start with a low-risk photometric MR to confirm invariance.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.97,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.95,
+     "bbox": [
+      1070.9,
+      176.4,
+      1173.7,
+      250.5
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.95,
+     "bbox": [
+      998.7,
+      177.8,
+      1057.1,
+      208.4
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.89,
+     "bbox": [
+      1070.9,
+      176.4,
+      1173.7,
+      250.5
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      998.7,
+      177.8,
+      1057.1,
+      208.4
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "2 cars",
+   "actualSummary": "2 cars",
+   "result": "PASS",
+   "failure": null
+  },
+  {
+   "id": "IMG-02",
+   "src": 60,
+   "image": "dataset/IMG-02.jpg",
+   "transformedImage": "dataset/IMG-02_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "2 cars + 1 pedestrian in an urban driving scene.",
+   "transformedCaption": "2 cars + 1 pedestrian \u2014 clear -> hazy.",
+   "sceneSummary": "2 cars + 1 pedestrian with ground-truth annotations.",
+   "mrId": "GMR-05",
+   "transformName": "Clear -> Hazy",
+   "transformStyle": "haze",
+   "selectionReason": "First generative probe \u2014 light atmospheric haze reduces contrast at range without changing scene content.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.93,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.92,
+     "bbox": [
+      655.0,
+      180.1,
+      688.7,
+      206.8
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.84,
+     "bbox": [
+      465.5,
+      179.2,
+      480.0,
+      210.4
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.92,
+     "bbox": [
+      744.7,
+      184.9,
+      763.0,
+      199.6
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.88,
+     "bbox": [
+      655.0,
+      180.1,
+      688.7,
+      206.8
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.8,
+     "bbox": [
+      465.5,
+      179.2,
+      480.0,
+      210.4
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.87,
+     "bbox": [
+      744.7,
+      184.9,
+      763.0,
+      199.6
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "2 cars + 1 pedestrian",
+   "actualSummary": "2 cars + 1 pedestrian",
+   "result": "PASS",
+   "failure": null
+  },
+  {
+   "id": "IMG-03",
+   "src": 43,
+   "image": "dataset/IMG-03.jpg",
+   "transformedImage": "dataset/IMG-03_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "3 cars + 1 pedestrian in an urban driving scene.",
+   "transformedCaption": "3 cars + 1 pedestrian \u2014 camera motion blur.",
+   "sceneSummary": "3 cars + 1 pedestrian with ground-truth annotations.",
+   "mrId": "GMR-09",
+   "transformName": "Camera motion blur",
+   "transformStyle": "motionblur",
+   "selectionReason": "Directional blur simulates a moving mount / rolling-shutter smear, a realistic on-vehicle camera condition.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.92,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      422.5,
+      177.8,
+      481.4,
+      207.0
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      886.7,
+      166.5,
+      931.2,
+      182.8
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.91,
+     "bbox": [
+      708.6,
+      174.8,
+      736.2,
+      199.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.82,
+     "bbox": [
+      590.0,
+      173.1,
+      596.3,
+      193.3
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.86,
+     "bbox": [
+      422.5,
+      177.8,
+      481.4,
+      207.0
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.86,
+     "bbox": [
+      886.7,
+      166.5,
+      931.2,
+      182.8
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.86,
+     "bbox": [
+      708.6,
+      174.8,
+      736.2,
+      199.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.79,
+     "bbox": [
+      590.0,
+      173.1,
+      596.3,
+      193.3
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "3 cars + 1 pedestrian",
+   "actualSummary": "3 cars + 1 pedestrian",
+   "result": "PASS",
+   "failure": null
+  },
+  {
+   "id": "IMG-04",
+   "src": 64,
+   "image": "dataset/IMG-04.jpg",
+   "transformedImage": "dataset/IMG-04_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "2 cars + 1 pedestrian in an urban driving scene.",
+   "transformedCaption": "2 cars + 1 pedestrian \u2014 rotation 9 degrees.",
+   "sceneSummary": "2 cars + 1 pedestrian with ground-truth annotations.",
+   "mrId": "MR-07",
+   "transformName": "Rotation 9 degrees",
+   "transformStyle": "rotate",
+   "selectionReason": "One geometric check \u2014 rotation verifies the detector equivariantly transforms box coordinates.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.93,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.88,
+     "bbox": [
+      0.0,
+      203.9,
+      256.9,
+      374.0
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.94,
+     "bbox": [
+      600.6,
+      179.4,
+      861.9,
+      267.1
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.82,
+     "bbox": [
+      351.8,
+      171.5,
+      376.5,
+      236.7
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.84,
+     "bbox": [
+      10.2,
+      260.7,
+      290.6,
+      468.8
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.91,
+     "bbox": [
+      599.6,
+      141.8,
+      871.4,
+      269.3
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.77,
+     "bbox": [
+      352.6,
+      209.9,
+      387.2,
+      278.2
+     ]
+    }
+   ],
+   "transformedBoxes": [
+    [
+     10.21106476227903,
+     260.6558724333373,
+     290.55769689094217,
+     468.8496783109765
+    ],
+    [
+     599.5840136167483,
+     141.81465196541575,
+     871.3863297348561,
+     269.31126484576566
+    ],
+    [
+     352.61133521440274,
+     209.94521325281423,
+     387.20677592706807,
+     278.2064232415257
+    ]
+   ],
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "2 cars + 1 pedestrian \u00b7 boxes follow the 9 degrees rotation",
+   "actualSummary": "2 cars + 1 pedestrian",
+   "result": "PASS",
+   "failure": null
+  },
+  {
+   "id": "IMG-05",
+   "src": 24,
+   "image": "dataset/IMG-05.jpg",
+   "transformedImage": "dataset/IMG-05_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "5 cars + 1 truck in an urban driving scene.",
+   "transformedCaption": "4 cars + 1 truck \u2014 clear -> foggy.",
+   "sceneSummary": "5 cars + 1 truck with ground-truth annotations.",
+   "mrId": "GMR-02",
+   "transformName": "Clear -> Foggy",
+   "transformStyle": "fog",
+   "selectionReason": "Low-visibility conditions are high priority for the declared domain and untested so far. Generative fog edit.",
+   "clipThreshold": 0.85,
+   "clipInitial": 0.79,
+   "regenerated": true,
+   "clipScore": 0.91,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.95,
+     "bbox": [
+      341.0,
+      185.1,
+      453.5,
+      263.8
+     ]
+    },
+    {
+     "cls": "truck",
+     "conf": 0.84,
+     "bbox": [
+      326.7,
+      155.1,
+      436.3,
+      207.7
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.81,
+     "bbox": [
+      106.2,
+      179.8,
+      225.0,
+      218.6
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.87,
+     "bbox": [
+      347.4,
+      183.1,
+      438.9,
+      227.2
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.86,
+     "bbox": [
+      498.8,
+      176.8,
+      580.6,
+      205.1
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.95,
+     "bbox": [
+      618.0,
+      174.2,
+      702.5,
+      200.3
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.84,
+     "bbox": [
+      341.0,
+      185.1,
+      453.5,
+      263.8
+     ]
+    },
+    {
+     "cls": "truck",
+     "conf": 0.78,
+     "bbox": [
+      326.7,
+      155.1,
+      436.3,
+      207.7
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.73,
+     "bbox": [
+      106.2,
+      179.8,
+      225.0,
+      218.6
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.79,
+     "bbox": [
+      347.4,
+      183.1,
+      438.9,
+      227.2
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.74,
+     "bbox": [
+      498.8,
+      176.8,
+      580.6,
+      205.1
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "5 cars + 1 truck  (all retained)",
+   "actualSummary": "4 cars + 1 truck",
+   "result": "VIOLATION",
+   "failure": {
+    "category": "object disappearance",
+    "affectedClass": "car",
+    "severity": "MEDIUM",
+    "observed": "A distant car (baseline confidence 0.95) is no longer detected after the fog transformation; remaining detections lost 0.06\u20130.14 confidence.",
+    "likelyCause": "The detector is sensitive to atmospheric contrast loss for small, low-confidence objects at range."
+   }
+  },
+  {
+   "id": "IMG-06",
+   "src": 74,
+   "image": "dataset/IMG-06.jpg",
+   "transformedImage": "dataset/IMG-06_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "2 pedestrians + 2 cyclists in an urban driving scene.",
+   "transformedCaption": "3 pedestrians + 1 cyclist \u2014 clear -> rainy.",
+   "sceneSummary": "2 pedestrians + 2 cyclists with ground-truth annotations.",
+   "mrId": "GMR-01",
+   "transformName": "Clear -> Rainy",
+   "transformStyle": "rain",
+   "selectionReason": "Two cyclists present; rain streaks degrade thin bicycle structure and have caused vulnerable-road-user errors in similar models.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.9,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "cyclist",
+     "conf": 0.74,
+     "bbox": [
+      1012.2,
+      138.4,
+      1123.6,
+      287.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.83,
+     "bbox": [
+      1114.7,
+      149.8,
+      1186.8,
+      260.8
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.73,
+     "bbox": [
+      1072.8,
+      153.3,
+      1116.7,
+      262.8
+     ]
+    },
+    {
+     "cls": "cyclist",
+     "conf": 0.62,
+     "bbox": [
+      799.4,
+      165.8,
+      819.6,
+      211.5
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "pedestrian",
+     "conf": 0.55,
+     "bbox": [
+      1012.2,
+      138.4,
+      1123.6,
+      287.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.76,
+     "bbox": [
+      1114.7,
+      149.8,
+      1186.8,
+      260.8
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.65,
+     "bbox": [
+      1072.8,
+      153.3,
+      1116.7,
+      262.8
+     ]
+    },
+    {
+     "cls": "cyclist",
+     "conf": 0.58,
+     "bbox": [
+      799.4,
+      165.8,
+      819.6,
+      211.5
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "2 pedestrians + 2 cyclists  (all retained)",
+   "actualSummary": "3 pedestrians + 1 cyclist",
+   "result": "VIOLATION",
+   "failure": {
+    "category": "class confusion",
+    "affectedClass": "cyclist",
+    "severity": "MEDIUM",
+    "observed": "Under rain the cyclist (baseline 0.74) is re-classified as a pedestrian (0.55). Rain streaks and lens droplets blur the bicycle frame, removing the distinguishing cue.",
+    "likelyCause": "The cyclist vs pedestrian boundary depends on thin bicycle structure that rain degrades."
+   }
+  },
+  {
+   "id": "IMG-07",
+   "src": 63,
+   "image": "dataset/IMG-07.jpg",
+   "transformedImage": "dataset/IMG-07_t.jpg",
+   "width": 1224,
+   "height": 370,
+   "title": "KITTI street scene",
+   "caption": "2 cars + 2 pedestrians + 1 cyclist in an urban driving scene.",
+   "transformedCaption": "2 cars + 2 pedestrians + 1 cyclist \u2014 day -> night.",
+   "sceneSummary": "2 cars + 2 pedestrians + 1 cyclist with ground-truth annotations.",
+   "mrId": "GMR-03",
+   "transformName": "Day -> Night",
+   "transformStyle": "night",
+   "selectionReason": "Testing memory shows fog and haze already degraded distant detections; low-light is a correlated condition worth probing.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.88,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.83,
+     "bbox": [
+      798.5,
+      148.8,
+      877.9,
+      175.8
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.92,
+     "bbox": [
+      548.2,
+      164.2,
+      573.4,
+      184.0
+     ]
+    },
+    {
+     "cls": "cyclist",
+     "conf": 0.85,
+     "bbox": [
+      578.9,
+      166.3,
+      600.0,
+      186.7
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.73,
+     "bbox": [
+      474.2,
+      168.6,
+      484.4,
+      191.2
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.67,
+     "bbox": [
+      616.9,
+      162.5,
+      624.2,
+      183.1
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.79,
+     "bbox": [
+      798.5,
+      148.8,
+      877.9,
+      175.8
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      548.2,
+      164.2,
+      573.4,
+      184.0
+     ]
+    },
+    {
+     "cls": "cyclist",
+     "conf": 0.82,
+     "bbox": [
+      578.9,
+      166.3,
+      600.0,
+      186.7
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.39,
+     "bbox": [
+      474.2,
+      168.6,
+      484.4,
+      191.2
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.34,
+     "bbox": [
+      616.9,
+      162.5,
+      624.2,
+      183.1
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "2 cars + 2 pedestrians + 1 cyclist  (all retained)",
+   "actualSummary": "2 cars + 2 pedestrians + 1 cyclist",
+   "result": "VIOLATION",
+   "failure": {
+    "category": "confidence degradation",
+    "affectedClass": "pedestrian",
+    "severity": "HIGH",
+    "observed": "Pedestrian detection confidence collapses from ~0.88 to ~0.40 (below the 0.50 decision threshold) under the night transformation, while vehicle detections stay stable.",
+    "likelyCause": "Low-light pedestrian examples are under-represented in training; vehicles keep strong lighting cues that pedestrians lack at night."
+   }
+  },
+  {
+   "id": "IMG-08",
+   "src": 25,
+   "image": "dataset/IMG-08.jpg",
+   "transformedImage": "dataset/IMG-08_t.jpg",
+   "width": 1224,
+   "height": 370,
+   "title": "KITTI street scene",
+   "caption": "4 pedestrians in an urban driving scene.",
+   "transformedCaption": "3 pedestrians \u2014 partial pedestrian occlusion.",
+   "sceneSummary": "4 pedestrians with ground-truth annotations.",
+   "mrId": "DMR-01",
+   "transformName": "Partial pedestrian occlusion",
+   "transformStyle": "occlusion",
+   "selectionReason": "Domain-specific MR. Four pedestrians present; occlusion is the top-ranked untested domain risk from the failure profile.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.92,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "pedestrian",
+     "conf": 0.71,
+     "bbox": [
+      1004.9,
+      145.3,
+      1092.6,
+      369.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.89,
+     "bbox": [
+      1081.9,
+      117.0,
+      1149.5,
+      369.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.88,
+     "bbox": [
+      918.3,
+      148.4,
+      984.3,
+      369.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.79,
+     "bbox": [
+      592.8,
+      148.3,
+      668.2,
+      328.5
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "pedestrian",
+     "conf": 0.7,
+     "bbox": [
+      1004.9,
+      145.3,
+      1092.6,
+      369.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.86,
+     "bbox": [
+      1081.9,
+      117.0,
+      1149.5,
+      369.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.86,
+     "bbox": [
+      918.3,
+      148.4,
+      984.3,
+      369.0
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": [
+    581,
+    169,
+    628,
+    338
+   ],
+   "insertBox": null,
+   "expectedSummary": "4 pedestrians  (all retained)",
+   "actualSummary": "3 pedestrians",
+   "result": "VIOLATION",
+   "failure": {
+    "category": "false negative",
+    "affectedClass": "pedestrian",
+    "severity": "HIGH",
+    "observed": "A pedestrian with ~45% occlusion (head, torso and one leg still visible) is not detected at all; baseline confidence was 0.79.",
+    "likelyCause": "The detector relies on near-complete pedestrian silhouettes; occluded-pedestrian augmentation is missing."
+   }
+  },
+  {
+   "id": "IMG-09",
+   "src": 31,
+   "image": "dataset/IMG-09.jpg",
+   "transformedImage": "dataset/IMG-09_t.jpg",
+   "width": 1242,
+   "height": 375,
+   "title": "KITTI street scene",
+   "caption": "1 car + 4 pedestrians in an urban driving scene.",
+   "transformedCaption": "1 car + 4 pedestrians \u2014 day -> dusk.",
+   "sceneSummary": "1 car + 4 pedestrians with ground-truth annotations.",
+   "mrId": "GMR-06",
+   "transformName": "Day -> Dusk",
+   "transformStyle": "dusk",
+   "selectionReason": "Between the low-light failures \u2014 dusk lighting with warm colour cast checks the softer end of the illumination range.",
+   "clipThreshold": 0.85,
+   "clipInitial": null,
+   "regenerated": false,
+   "clipScore": 0.94,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "pedestrian",
+     "conf": 0.71,
+     "bbox": [
+      1081.1,
+      135.2,
+      1150.5,
+      291.6
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.78,
+     "bbox": [
+      1110.3,
+      119.2,
+      1160.0,
+      296.4
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.93,
+     "bbox": [
+      403.6,
+      171.1,
+      480.1,
+      236.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.86,
+     "bbox": [
+      67.7,
+      197.0,
+      112.1,
+      299.1
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.78,
+     "bbox": [
+      657.3,
+      166.8,
+      673.3,
+      208.8
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "pedestrian",
+     "conf": 0.69,
+     "bbox": [
+      1081.1,
+      135.2,
+      1150.5,
+      291.6
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.75,
+     "bbox": [
+      1110.3,
+      119.2,
+      1160.0,
+      296.4
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      403.6,
+      171.1,
+      480.1,
+      236.0
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.8,
+     "bbox": [
+      67.7,
+      197.0,
+      112.1,
+      299.1
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.74,
+     "bbox": [
+      657.3,
+      166.8,
+      673.3,
+      208.8
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "1 car + 4 pedestrians",
+   "actualSummary": "1 car + 4 pedestrians",
+   "result": "PASS",
+   "failure": null
+  },
+  {
+   "id": "IMG-10",
+   "src": 68,
+   "image": "dataset/IMG-10.jpg",
+   "transformedImage": "dataset/IMG-10_t.jpg",
+   "width": 1224,
+   "height": 370,
+   "title": "KITTI street scene",
+   "caption": "4 cars + 2 pedestrians in an urban driving scene.",
+   "transformedCaption": "4 cars + 1 pedestrian \u2014 low-sun lens glare.",
+   "sceneSummary": "4 cars + 2 pedestrians with ground-truth annotations.",
+   "mrId": "GMR-10",
+   "transformName": "Low-sun lens glare",
+   "transformStyle": "glare",
+   "selectionReason": "Generative glare bloom over part of the frame \u2014 checks whether detections survive a blown-out region near the sun.",
+   "clipThreshold": 0.85,
+   "clipInitial": 0.81,
+   "regenerated": true,
+   "clipScore": 0.9,
+   "semanticPreserved": true,
+   "originalPreds": [
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      1137.6,
+      155.4,
+      1223.0,
+      216.2
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.84,
+     "bbox": [
+      976.3,
+      154.4,
+      1006.0,
+      218.4
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.86,
+     "bbox": [
+      969.3,
+      155.5,
+      997.7,
+      220.9
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.96,
+     "bbox": [
+      513.0,
+      161.0,
+      549.5,
+      195.3
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.81,
+     "bbox": [
+      531.7,
+      163.7,
+      561.2,
+      188.0
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.89,
+     "bbox": [
+      571.8,
+      165.6,
+      590.3,
+      181.5
+     ]
+    }
+   ],
+   "transformedPreds": [
+    {
+     "cls": "car",
+     "conf": 0.87,
+     "bbox": [
+      1137.6,
+      155.4,
+      1223.0,
+      216.2
+     ]
+    },
+    {
+     "cls": "pedestrian",
+     "conf": 0.79,
+     "bbox": [
+      976.3,
+      154.4,
+      1006.0,
+      218.4
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.9,
+     "bbox": [
+      513.0,
+      161.0,
+      549.5,
+      195.3
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.79,
+     "bbox": [
+      531.7,
+      163.7,
+      561.2,
+      188.0
+     ]
+    },
+    {
+     "cls": "car",
+     "conf": 0.83,
+     "bbox": [
+      571.8,
+      165.6,
+      590.3,
+      181.5
+     ]
+    }
+   ],
+   "transformedBoxes": null,
+   "occluder": null,
+   "insertBox": null,
+   "expectedSummary": "4 cars + 2 pedestrians  (all retained)",
+   "actualSummary": "4 cars + 1 pedestrian",
+   "result": "VIOLATION",
+   "failure": {
+    "category": "false negative",
+    "affectedClass": "pedestrian",
+    "severity": "HIGH",
+    "observed": "A pedestrian standing inside the glare bloom is lost entirely; the blown-out region erases edge and texture cues (baseline confidence 0.86).",
+    "likelyCause": "Over-exposed regions collapse local contrast; the detector has little high-dynamic-range or lens-flare augmentation."
+   }
+  }
+ ]
+}
