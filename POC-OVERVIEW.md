@@ -162,6 +162,35 @@ blue cast + vignette, rain streaks, haze, warm dusk, radial glare bloom).
 
 ---
 
+## 4a. Credibility & explainer features (added in the upgrade)
+
+- **POC-mode badge** in the header — "POC MODE · DETERMINISTIC DEMONSTRATION" with a popover
+  explaining that the orchestration/validation/logic/memory/reporting are real and the external
+  model/tool calls are deterministic. Not repeated on every page.
+- **Relation funnel** — one honest chain everywhere it matters:
+  `40 candidate → 38 validated → 10 selected → 10 executed`
+  (21 base + 19 proposed relations; 2 rejected — horizontal flip breaks left/right semantics,
+  "Clear → Snowy" is redundant with base relation MR-20).
+- **Featured test trace** (Dashboard) — one expandable, 9-step end-to-end walkthrough of a single
+  case (Source → AI analysis → Relation → Transform → CLIP → Model → Verify → Result → Memory)
+  with the before/after images and the real confidence numbers.
+- **Why metamorphic testing** — a compact Conventional-vs-Metamorph comparison (Dashboard + Results),
+  with careful language: metamorphic testing *complements* a conventional test set by generating
+  follow-up tests from input–behaviour relations.
+- **Agent loop** panel — Observe → Analyse → Generate → Select → Test → Verify → Learn ↺, stated as
+  "adaptive prioritisation", explicitly *not* machine learning from the memory.
+- **Expected vs Observed** block (Testing + Results) — the relation's expected behaviour, the
+  observed confidence change on the affected class, the percentage change, the verdict, and a
+  one-line agent interpretation.
+- **Testing-memory panel** — conditions probed · observed vulnerabilities · affected class ·
+  the adaptive-prioritisation rule for the remaining budget.
+- **Structured violation cards** — Condition / Affected class / Expected / Observed / Effect /
+  Severity / before-after evidence, instead of a bare "Violation" label.
+- **Final Report** — a generated 13-section testing report (executive summary, scope, model under
+  test, test data, relations, executions, results, violations, robustness by condition, affected
+  classes, key findings, limitations, assessment) + a POC implementation note. Keeps the
+  "not a production-readiness guarantee" caveat.
+
 ## 5. Cross-cutting features
 
 - **Deterministic run engine** (`useTestingPipeline`) — a frame-by-frame simulation: boot
