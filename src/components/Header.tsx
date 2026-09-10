@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Gauge, RotateCcw } from "lucide-react";
 import { usePipeline } from "../hooks/useTestingPipeline";
 import ThemeToggle from "./ThemeToggle";
+import PocBadge from "./PocBadge";
 
 const TITLES: Record<string, string> = {
   "/": "Dashboard",
@@ -46,6 +47,9 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-2.5">
+        <div className="hidden lg:block">
+          <PocBadge />
+        </div>
         <span className="mono hidden text-slate-500 sm:inline">{statusText}</span>
         {status !== "idle" && (
           <>

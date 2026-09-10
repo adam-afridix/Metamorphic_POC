@@ -59,7 +59,7 @@ export function buildFrames(domainLabel: string): Frame[] {
     { scope: "global", stage: "boot", kind: "info", text: `Bootstrap complete — ${SWEEP_RESULTS} transformed samples written to testing memory.` },
     { scope: "global", stage: "boot", kind: "agent", text: "Sweep analysis — early degradation concentrated under low visibility, night and occlusion." },
     { scope: "global", stage: "boot", kind: "agent", text: `MR discovery — ${BASE_MRS.length} base relations + ${GENERATED_MRS.length} synthesised from sweep patterns and the ${d} domain.` },
-    { scope: "global", stage: "boot", kind: "info", text: `MR validation — ${POOL} candidates screened; ${ADMITTED} admitted, 1 rejected (horizontal flip breaks left/right traffic semantics).` },
+    { scope: "global", stage: "boot", kind: "info", text: `MR validation — ${POOL} candidate relations screened; ${ADMITTED} validated, ${POOL - ADMITTED} rejected (horizontal flip breaks left/right semantics; snow relation redundant with MR-20).` },
     { scope: "global", stage: "boot", kind: "agent", text: "Adaptive loop starting — budget 10. Each iteration: pick image → describe → choose relation → generate → semantic check → run model → verify." },
   ];
 

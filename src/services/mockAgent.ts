@@ -38,23 +38,32 @@ export function parseDomain(text: string): DomainProfile {
 
 export const discoveredMRs = () => GENERATED_MRS;
 
-/** The MR validator: an LLM-proposed MR must clear these checks before becoming a test. */
+/** The MR validator: a proposed relation must clear every check before it can be selected for testing. */
 export interface ValidationRow {
   check: string;
   ok: boolean;
   note: string;
 }
 
-export function validateMR(mrName: string): ValidationRow[] {
-  const rejected = mrName.toLowerCase().includes("mirror") || mrName.toLowerCase().includes("flip");
-  return [
-    { check: "MR schema", ok: true, note: "well-formed transform + relation" },
-    { check: "Task compatibility", ok: true, note: "valid for object detection" },
-    { check: "Domain consistency", ok: !rejected, note: rejected ? "horizontal flip changes left/right traffic semantics" : "consistent with declared domain" },
-    { check: "Transformation feasibility", ok: true, note: "deterministic / generative service available" },
-    { check: "Expected output relation", ok: true, note: "relation is well-defined and checkable" },
-    { check: "Semantic preservation", ok: !rejected, note: rejected ? "not guaranteed" : "constraints specified" },
+export interface ValidationResult {
+  rows: ValidationRow[];
+  verdict: "VALIDATED" | "REJECTED";
+}
+
+export function validateMR(mrName: string): ValidationResult {
+  const n = mrName.toLowerCase();
+  const isFlip = n.includes("mirror") || n.includes("flip");
+  const isRedundant = n.includes("snow"); // overlaps base MR-20 "Sunny → snowy"
+
+  const rows: ValidationRow[] = [
+    { check: "Domain relevance", ok: !isFlip, note: isFlip ? "mirroring swaps left/right road semantics" : "condition occurs in the declared domain" },
+    { check: "Semantic consistency", ok: !isFlip, note: isFlip ? "changes scene meaning, not just appearance" : "transformation preserves scene meaning" },
+    { check: "Transformation validity", ok: true, note: "deterministic / generative service can produce it" },
+    { check: "Expected prediction relationship", ok: true, note: "an expected input–output relation is defined" },
+    { check: "Testability", ok: true, note: "the relation is checkable by the oracle" },
+    { check: "Non-redundancy", ok: !isRedundant, note: isRedundant ? "already covered by base relation MR-20" : "not covered by an existing relation" },
   ];
+  return { rows, verdict: rows.every((r) => r.ok) ? "VALIDATED" : "REJECTED" };
 }
 
 /** Whether the metamorphic relation held, based on the pre-authored result. */

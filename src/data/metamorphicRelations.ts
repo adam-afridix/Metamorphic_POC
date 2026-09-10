@@ -93,7 +93,7 @@ export const GENERATED_MRS: MetamorphicRelation[] = [
   },
 
   // weather / time / illumination
-  { id: "GMR-04", name: "Clear → Snowy", category: "generative", relationType: "invariant", generated: true, expected: "Road users remain detectable under snow cover and glare." },
+  { id: "GMR-04", name: "Clear → Snowy", category: "generative", relationType: "invariant", generated: true, rejected: true, expected: "Rejected — redundant with base relation MR-20 (Sunny → snowy)." },
   { id: "GMR-05", name: "Clear → Hazy", category: "generative", relationType: "invariant", generated: true, expected: "Objects remain detectable as haze reduces contrast at range." },
   { id: "GMR-06", name: "Day → Dusk", category: "generative", relationType: "invariant", generated: true, expected: "Predictions stable as ambient light drops and colour temperature shifts." },
   { id: "GMR-07", name: "Normal → Low-light", category: "generative", relationType: "invariant", generated: true, expected: "Object classes unchanged; confidence stays above the detection threshold." },
