@@ -118,7 +118,7 @@ function Analysis() {
             key={tc.id}
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: selected ? 1 : 0.35, scale: 1 }}
-            className="grid place-items-center rounded-xl border border-accent/40 bg-accent/5 p-6 text-center shadow-glow"
+            className="grid place-items-center rounded-lg border border-accent/40 bg-accent/5 p-6 text-center ring-1 ring-accent/15"
           >
             <Layers className="text-accent" />
             <div className="mt-2 text-xs text-slate-400">{tc.mr.id}</div>

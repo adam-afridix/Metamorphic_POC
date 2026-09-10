@@ -2,12 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Metamorph — theme tokens
+   Two modes of one design system.  Bare :root = "Warm Lab".
+   [data-theme="dark"] = "Dark".  Colours are "R G B" channels
+   so Tailwind's /opacity modifier works in both themes.
+   ============================================================ */
 :root {
+  color-scheme: light;
+
+  --bg:            245 241 232;   /* #F5F1E8 warm parchment */
+  --bg-2:          238 234 223;
+  --surface:       251 249 243;   /* #FBF9F3 cream card */
+  --surface-2:     233 229 218;   /* #E9E5DA muted stone */
+  --sidebar:       237 232 221;   /* darker warm stone */
+  --border:        216 211 199;   /* #D8D3C7 warm gray */
+  --border-strong: 199 193 177;
+
+  --text:          23 32 51;      /* #172033 deep ink navy */
+  --text-2:        101 112 132;   /* #657084 slate */
+  --text-3:        139 147 160;
+  --text-faint:    168 163 148;
+
+  --accent:        49 87 200;     /* #3157C8 deep cobalt */
+  --teal:          39 132 111;    /* #27846F forest teal */
+  --warn:          217 101 90;    /* #D9655A burnt coral */
+  --danger:        184 58 50;     /* #B83A32 deep vermilion */
+  --indigo:        90 79 184;     /* #5A4FB8 restrained violet-indigo */
+
+  --on-accent:     255 255 255;
+  --hover:         #efeae0;
+  --track:         #e4dfd2;
+  --card-shadow:   0 1px 2px rgb(23 32 51 / 0.055), 0 1px 1px rgb(23 32 51 / 0.03);
+  --canvas-grid:   rgb(23 32 51 / 0.028);
+}
+
+:root[data-theme="dark"] {
   color-scheme: dark;
-  --line: rgba(148, 163, 184, 0.1);
-  --line-strong: rgba(148, 163, 184, 0.16);
-  --surface: rgba(255, 255, 255, 0.025);
-  --surface-2: rgba(255, 255, 255, 0.045);
+
+  --bg:            8 11 18;       /* near-black navy */
+  --bg-2:          12 16 26;
+  --surface:       17 22 33;
+  --surface-2:     24 30 44;
+  --sidebar:       11 14 22;
+  --border:        42 50 65;
+  --border-strong: 62 72 92;
+
+  --text:          230 236 245;
+  --text-2:        151 163 181;
+  --text-3:        108 119 137;
+  --text-faint:    74 84 100;
+
+  --accent:        91 157 255;    /* keeps the dark identity */
+  --teal:          62 207 142;
+  --warn:          232 131 111;
+  --danger:        242 91 88;
+  --indigo:        168 156 240;
+
+  --on-accent:     8 12 22;
+  --hover:         #171c28;
+  --track:         #232a38;
+  --card-shadow:   none;
+  --canvas-grid:   rgb(255 255 255 / 0.022);
 }
 
 html,
@@ -22,16 +78,14 @@ body,
 
 body {
   margin: 0;
-  background-color: #06080f;
-  background-image:
-    radial-gradient(900px 500px at 12% -8%, rgba(59, 108, 214, 0.16), transparent 60%),
-    radial-gradient(700px 500px at 100% 0%, rgba(124, 92, 246, 0.1), transparent 55%);
+  background-color: rgb(var(--bg));
+  background-image: radial-gradient(circle, var(--canvas-grid) 1px, transparent 1.4px);
+  background-size: 30px 30px;
   background-attachment: fixed;
-  color: #cdd7e6;
+  color: rgb(var(--text-2));
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1,
@@ -41,19 +95,16 @@ h3 {
 }
 
 ::selection {
-  background: rgba(91, 157, 255, 0.28);
+  background: rgb(var(--accent) / 0.22);
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.18);
+  background: rgb(var(--border-strong));
   border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.3);
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -66,71 +117,89 @@ h3 {
   }
   body {
     background: #fff;
-    color: #0b1020;
+    color: #172033;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border bg-[var(--surface)] transition-colors duration-200;
-    border-color: var(--line);
-  }
-  .card:hover {
-    border-color: var(--line-strong);
+    background: rgb(var(--surface));
+    border: 1px solid rgb(var(--border));
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
   }
   .card-pad {
     @apply p-5;
   }
   .card-hover {
-    @apply transition-transform duration-200 hover:-translate-y-0.5;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .card-hover:hover {
+    border-color: rgb(var(--border-strong));
+    transform: translateY(-1px);
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium text-slate-300;
-    border-color: var(--line-strong);
-    background: var(--surface-2);
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-medium;
+    border: 1px solid rgb(var(--border));
+    background: rgb(var(--surface-2));
+    border-radius: 6px;
+    color: rgb(var(--text-2));
   }
 
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40;
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40;
   }
   .btn:focus-visible {
-    @apply outline-none ring-2 ring-accent/60 ring-offset-2 ring-offset-[#06080f];
+    @apply outline-none;
+    box-shadow: 0 0 0 2px rgb(var(--bg)), 0 0 0 4px rgb(var(--accent) / 0.55);
   }
   .btn-primary {
-    @apply btn bg-accent text-[#04070f] hover:brightness-110;
-    box-shadow: 0 6px 20px -8px rgba(91, 157, 255, 0.6);
+    @apply btn;
+    background: rgb(var(--accent));
+    color: rgb(var(--on-accent));
+  }
+  .btn-primary:hover {
+    background: rgb(var(--accent) / 0.88);
   }
   .btn-ghost {
-    @apply btn border text-slate-200;
-    border-color: var(--line-strong);
-    background: var(--surface-2);
+    @apply btn;
+    border: 1px solid rgb(var(--border));
+    background: rgb(var(--surface-2));
+    color: rgb(var(--text));
   }
   .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--hover);
+    border-color: rgb(var(--border-strong));
   }
 
   .label {
-    @apply text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500;
+    @apply text-[10px] font-semibold uppercase tracking-[0.14em];
+    color: rgb(var(--text-3));
   }
   .mono {
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     @apply text-[12.5px];
   }
   .hairline {
-    border-color: var(--line);
+    border-color: rgb(var(--border));
   }
 }
 
 @layer utilities {
   .glass {
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
   }
-  .grid-fade {
-    background-image: linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
-    background-size: 32px 32px;
-    -webkit-mask-image: radial-gradient(60% 60% at 50% 30%, #000, transparent);
-    mask-image: radial-gradient(60% 60% at 50% 30%, #000, transparent);
+  .bg-canvas {
+    background: rgb(var(--bg));
+  }
+  .bg-surface {
+    background: rgb(var(--surface));
+  }
+  .bg-hover {
+    background: var(--hover);
+  }
+  .bg-track {
+    background: var(--track);
   }
 }

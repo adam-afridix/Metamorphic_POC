@@ -27,9 +27,9 @@ export default function Sidebar() {
   const { status, memory, progress } = usePipeline();
 
   return (
-    <aside className="glass flex w-[236px] shrink-0 flex-col border-r hairline bg-black/20">
+    <aside className="flex w-[236px] shrink-0 flex-col border-r hairline bg-sidebar">
       <div className="flex items-center gap-2.5 px-5 pb-4 pt-5">
-        <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-accent/25 to-violet/20 text-accent ring-1 ring-white/10">
+        <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent/12 text-accent ring-1 ring-accent/20">
           <Sparkles size={17} />
         </div>
         <div className="leading-tight">
@@ -46,12 +46,12 @@ export default function Sidebar() {
                 {isActive && (
                   <motion.div
                     layoutId="nav-active"
-                    className="absolute inset-0 rounded-lg bg-accent/12 ring-1 ring-accent/25"
-                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    className="absolute inset-0 rounded-md border-l-2 border-accent bg-accent/[0.09]"
+                    transition={{ type: "spring", stiffness: 400, damping: 34 }}
                   />
                 )}
                 <div
-                  className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
+                  className={`relative flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-colors ${
                     isActive ? "text-accent" : "text-slate-500 hover:text-slate-200"
                   }`}
                 >
@@ -64,7 +64,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="m-3 rounded-xl border hairline bg-white/[0.03] p-3">
+      <div className="m-3 rounded-lg border hairline bg-base-850 p-3">
         <div className="flex items-center justify-between text-[11px]">
           <span className="text-slate-500">Pipeline</span>
           <span
@@ -92,7 +92,7 @@ export default function Sidebar() {
             {status}
           </span>
         </div>
-        <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="mt-2 h-1 overflow-hidden rounded-full bg-track">
           <motion.div
             className="h-full rounded-full bg-accent"
             animate={{ width: `${Math.round(progress * 100)}%` }}

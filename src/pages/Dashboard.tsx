@@ -30,11 +30,18 @@ const STRIP = [
 ];
 
 const ACCENT = {
-  blue: { bar: "bg-accent", text: "text-accent" },
-  green: { bar: "bg-pass", text: "text-pass" },
-  red: { bar: "bg-fail", text: "text-fail" },
-  indigo: { bar: "bg-violet", text: "text-violet" },
+  blue: { rail: "bg-accent", text: "text-accent", stroke: "rgb(var(--accent))" },
+  green: { rail: "bg-pass", text: "text-pass", stroke: "rgb(var(--teal))" },
+  red: { rail: "bg-fail", text: "text-fail", stroke: "rgb(var(--danger))" },
+  indigo: { rail: "bg-violet", text: "text-violet", stroke: "rgb(var(--indigo))" },
 } as const;
+
+const SPARKS: Record<keyof typeof ACCENT, string> = {
+  blue: "0,14 8,10 16,12 24,6 32,8 40,3 48,5",
+  green: "0,15 8,12 16,13 24,8 32,9 40,5 48,4",
+  red: "0,5 8,7 16,4 24,9 32,7 40,12 48,10",
+  indigo: "0,10 8,8 16,11 24,7 32,9 40,6 48,8",
+};
 
 function StatTile({
   to,
@@ -54,12 +61,24 @@ function StatTile({
   const a = ACCENT[accent];
   return (
     <Link to={to} className="card card-hover relative overflow-hidden card-pad block">
-      <span className={`absolute left-0 top-0 h-full w-0.5 ${a.bar}`} />
-      <div className="label">{label}</div>
+      <span className={`absolute left-0 top-0 h-full w-[3px] ${a.rail}`} />
+      <div className="flex items-start justify-between">
+        <div className="label">{label}</div>
+        <svg width="48" height="18" viewBox="0 0 48 18" className="opacity-45" aria-hidden>
+          <polyline
+            points={SPARKS[accent]}
+            fill="none"
+            stroke={a.stroke}
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
       <div className={`mt-1.5 text-3xl font-bold leading-none ${a.text}`}>
         <AnimatedNumber value={value} suffix={suffix} />
       </div>
-      <div className="mt-1 text-[12px] text-slate-500">{sub ?? " "}</div>
+      <div className="mt-1 text-[12px] text-slate-500">{sub ?? " "}</div>
     </Link>
   );
 }
@@ -72,28 +91,25 @@ function Donut({ passed, violations }: { passed: number; violations: number }) {
   return (
     <div className="relative h-32 w-32 shrink-0">
       <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="10" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="rgb(var(--border))" strokeWidth="9" />
         {total > 0 && (
           <>
-            <motion.circle
+            <circle
               cx="50"
               cy="50"
               r={r}
               fill="none"
-              stroke="#ff6b6b"
-              strokeWidth="10"
+              stroke="rgb(var(--danger))"
+              strokeWidth="9"
               strokeDasharray={c}
-              initial={{ strokeDashoffset: c }}
-              animate={{ strokeDashoffset: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
             />
             <motion.circle
               cx="50"
               cy="50"
               r={r}
               fill="none"
-              stroke="#3ddc97"
-              strokeWidth="10"
+              stroke="rgb(var(--teal))"
+              strokeWidth="9"
               strokeLinecap="round"
               strokeDasharray={c}
               initial={{ strokeDashoffset: c }}
@@ -122,15 +138,15 @@ function PipelineStrip() {
   const keys = ["pick", "describe", "plan", "transform", "clip", "model", "verify", "store"] as const;
 
   return (
-    <Link
-      to="/testing"
-      className="card card-pad card-hover block"
-      aria-label="Open the testing view"
-    >
+    <Link to="/testing" className="card card-pad card-hover block" aria-label="Open the testing view">
       <div className="mb-3 flex items-center justify-between">
         <span className="label">Testing pipeline</span>
         <span className="text-[11px] text-slate-500">
-          {status === "idle" ? "idle" : status === "done" ? "complete" : `iteration ${(activeCaseIndex ?? 0) + 1}/10`}
+          {status === "idle"
+            ? "idle"
+            : status === "done"
+            ? "complete"
+            : `iteration ${(activeCaseIndex ?? 0) + 1}/10`}
         </span>
       </div>
       <ol className="flex items-center">
@@ -140,25 +156,15 @@ function PipelineStrip() {
             <li key={s.label} className="flex flex-1 items-center last:flex-none">
               <div className="flex flex-col items-center gap-1">
                 <motion.span
-                  className={`grid h-9 w-9 place-items-center rounded-full border ${
+                  className={`grid h-9 w-9 place-items-center rounded-full border transition-colors ${
                     state === "done"
-                      ? "border-accent/60 bg-accent/20 text-accent"
+                      ? "border-accent/50 bg-accent/12 text-accent"
                       : state === "active"
-                      ? "border-accent bg-accent/25 text-accent shadow-glow"
+                      ? "border-accent bg-accent/10 text-accent ring-2 ring-accent/30"
                       : "border-base-700 text-slate-600"
                   }`}
-                  animate={
-                    state === "active"
-                      ? { scale: [1, 1.12, 1] }
-                      : status === "idle"
-                      ? { opacity: [0.4, 1, 0.4] }
-                      : {}
-                  }
-                  transition={
-                    state === "active"
-                      ? { repeat: Infinity, duration: 1.1 }
-                      : { repeat: Infinity, duration: 1.6, delay: i * 0.16 }
-                  }
+                  animate={state === "active" ? { scale: [1, 1.1, 1] } : {}}
+                  transition={state === "active" ? { repeat: Infinity, duration: 1.2 } : {}}
                 >
                   <s.icon size={16} />
                 </motion.span>
@@ -166,7 +172,7 @@ function PipelineStrip() {
               </div>
               {i < STRIP.length - 1 && (
                 <span
-                  className={`mx-1 h-px flex-1 ${state !== "todo" ? "bg-accent/40" : "bg-base-700"}`}
+                  className={`mx-1 h-px flex-1 ${state !== "todo" ? "bg-accent/45" : "bg-base-700"}`}
                 />
               )}
             </li>
@@ -192,15 +198,15 @@ function CondBars({ data }: { data: { condition: string; robustness: number; vio
       {data.map((d, i) => (
         <li key={d.condition} className="flex items-center gap-3 text-[13px]">
           <span className="w-24 shrink-0 truncate text-slate-400">{d.condition}</span>
-          <span className="h-2 flex-1 overflow-hidden rounded-full bg-base-700">
+          <span className="h-2 flex-1 overflow-hidden rounded-full bg-track">
             <span
               className={`block h-full rounded-full transition-[width] duration-700 ease-out ${
-                d.robustness < 60 ? "bg-fail" : "bg-accent"
+                d.robustness < 60 ? "bg-fail" : d.robustness < 80 ? "bg-warn" : "bg-pass"
               }`}
               style={{ width: on ? `${d.robustness}%` : "0%", transitionDelay: `${i * 40}ms` }}
             />
           </span>
-          <span className="mono w-9 shrink-0 text-right text-slate-500">{d.robustness}%</span>
+          <span className="mono w-9 shrink-0 text-right text-slate-400">{d.robustness}%</span>
         </li>
       ))}
     </ul>
@@ -218,7 +224,10 @@ export default function Dashboard() {
 
   const cta =
     status === "idle"
-      ? { label: canStart ? "Start run" : "Configure run", onClick: () => (canStart ? (start(), nav("/testing")) : nav("/setup")) }
+      ? {
+          label: canStart ? "Start run" : "Configure run",
+          onClick: () => (canStart ? (start(), nav("/testing")) : nav("/setup")),
+        }
       : status === "done"
       ? { label: "View report", onClick: () => nav("/report") }
       : { label: "Open testing", onClick: () => nav("/testing") };
@@ -240,10 +249,36 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile to="/testing" label="Iterations" value={memory.testsCompleted} suffix=" / 10" accent="blue" sub={status === "idle" ? "not started" : status} />
-        <StatTile to="/results" label="Pass rate" value={passRate} suffix="%" accent="green" sub={s.total ? `${s.passed} of ${s.total} satisfied` : "awaiting results"} />
-        <StatTile to="/violations" label="Violations" value={s.violations} accent="red" sub={`${s.highSeverity} high severity`} />
-        <StatTile to="/mr" label="Relation pool" value={pool} accent="indigo" sub={`${GENERATED_MRS.length} discovered`} />
+        <StatTile
+          to="/testing"
+          label="Iterations"
+          value={memory.testsCompleted}
+          suffix=" / 10"
+          accent="blue"
+          sub={status === "idle" ? "not started" : status}
+        />
+        <StatTile
+          to="/results"
+          label="Pass rate"
+          value={passRate}
+          suffix="%"
+          accent="green"
+          sub={s.total ? `${s.passed} of ${s.total} satisfied` : "awaiting results"}
+        />
+        <StatTile
+          to="/violations"
+          label="Violations"
+          value={s.violations}
+          accent="red"
+          sub={`${s.highSeverity} high severity`}
+        />
+        <StatTile
+          to="/mr"
+          label="Relation pool"
+          value={pool}
+          accent="indigo"
+          sub={`${GENERATED_MRS.length} discovered`}
+        />
       </div>
 
       <PipelineStrip />
@@ -269,11 +304,11 @@ export default function Dashboard() {
               <div className="space-y-2 text-[13px]">
                 <div>
                   <div className="text-slate-500">Most affected class</div>
-                  <div className="font-medium text-fail">{s.mostAffected}</div>
+                  <div className="font-semibold text-fail">{s.mostAffected}</div>
                 </div>
                 <div>
                   <div className="text-slate-500">Weakest condition</div>
-                  <div className="font-medium text-slate-200">
+                  <div className="font-semibold text-slate-200">
                     {conds[0] ? `${conds[0].condition} · ${conds[0].robustness}%` : "—"}
                   </div>
                 </div>

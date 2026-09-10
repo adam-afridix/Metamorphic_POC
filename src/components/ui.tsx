@@ -105,15 +105,13 @@ export function MetricCard({
 export function Progress({ value, tone = "accent" }: { value: number; tone?: "accent" | "pass" }) {
   const color = tone === "pass" ? "bg-pass" : "bg-accent";
   return (
-    <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-track">
       <motion.div
         className={`h-full rounded-full ${color}`}
         initial={{ width: 0 }}
         animate={{ width: `${Math.round(value * 100)}%` }}
         transition={{ ease: "easeOut", duration: 0.5 }}
-      >
-        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-      </motion.div>
+      />
     </div>
   );
 }
@@ -136,7 +134,7 @@ export function Bar({
   return (
     <div className="flex items-center gap-3">
       <div className="w-40 shrink-0 truncate text-[13px] text-slate-400">{label}</div>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-track">
         <motion.div
           className={`h-full rounded-full ${color}`}
           initial={{ width: 0 }}
