@@ -28,7 +28,7 @@ export default function MRCard({ mr, index = 0 }: { mr: MetamorphicRelation; ind
           }`}
         >
           {mr.generated ? <Sparkles size={11} /> : <Library size={11} />}
-          {mr.generated ? "LLM-discovered" : "Base library"}
+          {mr.rejected ? "rejected" : mr.generated ? "proposed" : "base library"}
         </span>
       </div>
       <div className="mt-2 text-[14px] font-semibold text-slate-100">{mr.name}</div>

@@ -9,13 +9,10 @@ import { RELATION_STATS, REJECTED_RELATIONS } from "../lib/relationStats";
 import { BASELINE_PROFILE } from "../services/mockModel";
 import { RESOLVED_CASES } from "../data/testCases";
 
-let sectionN = 0;
 function Section({ title, children }: { title: string; children: ReactNode }) {
-  sectionN += 1;
   return (
     <section className="border-t hairline pt-5">
-      <h2 className="mb-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-        <span className="mono mr-2 text-slate-600">{String(sectionN).padStart(2, "0")}</span>
+      <h2 className="report-h2 mb-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-500">
         {title}
       </h2>
       <div className="text-[13px] leading-relaxed text-slate-300">{children}</div>
@@ -37,7 +34,6 @@ function KV({ items }: { items: [string, ReactNode][] }) {
 }
 
 function ReportView() {
-  sectionN = 0;
   const { completedCases, status, config, domainProfile } = usePipeline();
   const done = status === "done" && completedCases.length === RESOLVED_CASES.length;
   const cases = completedCases;
@@ -67,6 +63,7 @@ function ReportView() {
         </p>
       )}
 
+      <div className="report-sections space-y-6">
       <Section title="Executive summary">
         Metamorphic testing exercised {s.total} generated transformations against the detector.
         {" "}
@@ -229,6 +226,7 @@ function ReportView() {
           guarantee of production readiness.
         </p>
       </Section>
+      </div>
 
       <div className="rounded-md border hairline bg-base-800 p-3 text-[11.5px] leading-relaxed text-slate-500">
         <span className="font-medium text-slate-400">POC implementation note — </span>

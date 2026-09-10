@@ -184,6 +184,18 @@ h3 {
   .hairline {
     border-color: rgb(var(--border));
   }
+
+  .report-sections {
+    counter-reset: report-section;
+  }
+  .report-sections > section {
+    counter-increment: report-section;
+  }
+  .report-sections > section > .report-h2::before {
+    content: counter(report-section, decimal-leading-zero) "  ";
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    color: rgb(var(--text-faint));
+  }
 }
 
 @layer utilities {

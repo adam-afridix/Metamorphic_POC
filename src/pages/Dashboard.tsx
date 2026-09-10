@@ -304,7 +304,7 @@ export default function Dashboard() {
 
       <div>
         <div className="label mb-2">Featured test trace</div>
-        <TestTrace tc={HERO_CASE} caseNumber={HERO_NUMBER} defaultOpen />
+        <TestTrace tc={HERO_CASE} caseNumber={HERO_NUMBER} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
