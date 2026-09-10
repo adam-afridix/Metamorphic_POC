@@ -2,10 +2,13 @@ import { useSearchParams } from "react-router-dom";
 import { Check, X, ChevronRight } from "lucide-react";
 import { usePipeline } from "../hooks/useTestingPipeline";
 import RequireRun from "../components/RequireRun";
-import { MetricCard, ResultBadge, SeverityBadge, Bar } from "../components/ui";
+import { ResultBadge, SeverityBadge, Bar } from "../components/ui";
 import ImageComparison from "../components/ImageComparison";
 import PredictionTable from "../components/PredictionTable";
+import ExpectedObserved from "../components/ExpectedObserved";
+import WhyMetamorph from "../components/WhyMetamorph";
 import { RESOLVED_CASES } from "../data/testCases";
+import { conditionRobustness, summary } from "../lib/report";
 
 function Detail({ id }: { id: string }) {
   const tc = RESOLVED_CASES.find((c) => c.id === id)!;
@@ -25,28 +28,12 @@ function Detail({ id }: { id: string }) {
             <div className="label">MR oracle · {tc.mr.id}</div>
             <ResultBadge result={tc.result} />
           </div>
-          <p className="text-xs text-slate-400">
-            <span className="text-slate-500">Expected relation — </span>
-            {tc.mr.expected}
-          </p>
-          <div className="mono mt-3 space-y-1 text-[12px]">
-            <div className="text-slate-500">expected: <span className="text-slate-300">{tc.expectedSummary}</span></div>
-            <div className="text-slate-500">actual: <span className="text-slate-300">{tc.actualSummary}</span></div>
-            <div className="text-slate-500">CLIP: <span className="text-slate-300">{(tc.clipScore * 100).toFixed(1)}%</span></div>
+          <div className="mono mt-2 text-[11px] text-slate-500">
+            CLIP {(tc.clipScore * 100).toFixed(1)}% · relation type {tc.mr.relationType}
           </div>
-          {tc.failure && (
-            <div className="mt-3 rounded-lg border border-fail/30 bg-fail/5 p-3">
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-sm font-semibold text-fail">{tc.failure.category}</span>
-                <SeverityBadge severity={tc.failure.severity} />
-              </div>
-              <p className="text-xs leading-relaxed text-slate-300">{tc.failure.observed}</p>
-              <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
-                <span className="text-slate-500">Likely cause — </span>
-                {tc.failure.likelyCause}
-              </p>
-            </div>
-          )}
+          <div className="mt-3">
+            <ExpectedObserved tc={tc} />
+          </div>
         </div>
       </div>
     </div>
@@ -73,15 +60,53 @@ function ResultsView() {
     );
   }
 
-  const coverage = memory.testsCompleted / 10;
+  const s = summary(completedCases);
+  const conds = conditionRobustness(completedCases);
+  const evidence = [
+    { v: RESOLVED_CASES.length, k: "source cases" },
+    { v: s.total, k: "test executions" },
+    { v: s.passed, k: "relations satisfied", tone: "text-pass" },
+    { v: s.violations, k: "violations", tone: "text-fail" },
+    { v: s.highSeverity, k: "high-severity", tone: "text-fail" },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-4">
-        <MetricCard label="Tests" value={memory.testsCompleted} />
-        <MetricCard label="Relations satisfied" value={memory.passed} tone="pass" />
-        <MetricCard label="Violations" value={memory.violations} tone="fail" />
-        <MetricCard label="Image coverage" value={`${Math.round(coverage * 100)}%`} tone="accent" />
+      <p className="text-[13px] text-slate-400">What the testing run revealed about the model.</p>
+
+      <div className="card card-pad">
+        <div className="label mb-3">Evidence</div>
+        <div className="flex flex-wrap gap-x-10 gap-y-4">
+          {evidence.map((e) => (
+            <div key={e.k}>
+              <div className={`text-2xl font-bold tabular-nums ${e.tone ?? "text-slate-100"}`}>{e.v}</div>
+              <div className="text-[11px] uppercase tracking-wide text-slate-500">{e.k}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-4 border-t hairline pt-4 sm:grid-cols-2">
+          <div>
+            <div className="label mb-1.5">Most vulnerable conditions</div>
+            <ol className="space-y-1 text-[12.5px] text-slate-300">
+              {conds.filter((c) => c.violations > 0).map((c, i) => (
+                <li key={c.condition} className="flex items-center justify-between">
+                  <span><span className="mono mr-2 text-slate-600">{i + 1}</span>{c.condition}</span>
+                  <span className="mono text-slate-500">{c.robustness}% robust</span>
+                </li>
+              ))}
+              {conds.filter((c) => c.violations > 0).length === 0 && (
+                <li className="text-slate-500">None — every relation was satisfied.</li>
+              )}
+            </ol>
+          </div>
+          <div>
+            <div className="label mb-1.5">Most affected class</div>
+            <div className="text-sm font-semibold text-fail">{s.mostAffected}</div>
+            <p className="mt-3 text-[11.5px] text-slate-500">
+              These results represent the deterministic POC demonstration run.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="card overflow-hidden">
@@ -117,13 +142,15 @@ function ResultsView() {
       </div>
 
       <div className="card card-pad">
-        <div className="label mb-3">MR usage (from testing memory)</div>
+        <div className="label mb-3">Relations exercised</div>
         <div className="space-y-2">
           {memory.mrUsage.map((m) => (
             <Bar key={m.mr} label={m.mr} value={m.count} max={Math.max(2, ...memory.mrUsage.map((x) => x.count))} />
           ))}
         </div>
       </div>
+
+      <WhyMetamorph compact />
     </div>
   );
 }

@@ -2,11 +2,13 @@ import { motion } from "framer-motion";
 import { Pause, Play, SkipForward, StepForward, RotateCcw, Check, X, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePipeline } from "../hooks/useTestingPipeline";
-import { Progress, ResultBadge, SeverityBadge, EmptyState } from "../components/ui";
+import { Progress, EmptyState } from "../components/ui";
 import StageChecklist from "../components/StageChecklist";
 import EventLog from "../components/EventLog";
 import ImageComparison from "../components/ImageComparison";
 import PredictionTable from "../components/PredictionTable";
+import ExpectedObserved from "../components/ExpectedObserved";
+import TestingMemoryPanel from "../components/TestingMemoryPanel";
 import { RESOLVED_CASES } from "../data/testCases";
 import { runClip } from "../services/mockClip";
 
@@ -101,10 +103,10 @@ function CurrentCase() {
       )}
 
       {reached("plan") && (
-        <p className="text-[13px] leading-relaxed text-slate-400">
-          <span className="text-slate-500">Agent — </span>
-          {tc.selectionReason}
-        </p>
+        <div className="text-[13px] leading-relaxed">
+          <span className="label">Why this test was selected</span>
+          <p className="mt-1 text-slate-400">{tc.selectionReason}</p>
+        </div>
       )}
 
       {reached("clip") && (
@@ -136,22 +138,11 @@ function CurrentCase() {
       )}
 
       {reached("verify") && (
-        <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="text-[13px]">
-          <div className="mb-1 flex items-center gap-3">
-            <ResultBadge result={tc.result} />
-            {tc.failure && <SeverityBadge severity={tc.failure.severity} />}
-          </div>
+        <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
           <div className="mono text-[12px] text-slate-500">
-            expected: <span className="text-slate-300">{tc.expectedSummary}</span>
+            expected {tc.expectedSummary} · observed {tc.actualSummary}
           </div>
-          <div className="mono text-[12px] text-slate-500">
-            actual: <span className="text-slate-300">{tc.actualSummary}</span>
-          </div>
-          {tc.failure && (
-            <p className="mt-2 border-l-2 border-fail/50 pl-3 leading-relaxed text-slate-400">
-              {tc.failure.category} · {tc.failure.affectedClass} — {tc.failure.observed}
-            </p>
-          )}
+          <ExpectedObserved tc={tc} />
         </motion.div>
       )}
     </div>
@@ -195,39 +186,6 @@ function Timeline() {
   );
 }
 
-function MemoryPanel() {
-  const { memory } = usePipeline();
-  return (
-    <div className="card card-pad">
-      <div className="label mb-2">Testing memory</div>
-      <div className="flex gap-5 text-sm">
-        <div>
-          <div className="font-semibold text-slate-100">{memory.testsCompleted}</div>
-          <div className="text-[11px] text-slate-500">tests</div>
-        </div>
-        <div>
-          <div className="font-semibold text-pass">{memory.passed}</div>
-          <div className="text-[11px] text-slate-500">passed</div>
-        </div>
-        <div>
-          <div className="font-semibold text-fail">{memory.violations}</div>
-          <div className="text-[11px] text-slate-500">violations</div>
-        </div>
-      </div>
-      {memory.failuresByCondition.length > 0 && (
-        <div className="mt-3 space-y-0.5">
-          {memory.failuresByCondition.map((f) => (
-            <div key={f.condition} className="flex justify-between text-[12px] text-slate-400">
-              <span>{f.condition}</span>
-              <span className="text-fail">{f.count}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function Testing() {
   const { status, canStart, events } = usePipeline();
   const nav = useNavigate();
@@ -254,9 +212,9 @@ export default function Testing() {
         <div className="space-y-4">
           <div className="card card-pad">
             <div className="label mb-2">Agent event stream</div>
-            <EventLog events={events} height="h-[360px]" />
+            <EventLog events={events} height="h-[300px]" />
           </div>
-          <MemoryPanel />
+          <TestingMemoryPanel />
           <Timeline />
         </div>
       </div>

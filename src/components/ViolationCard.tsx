@@ -1,53 +1,93 @@
+import type { ReactNode } from "react";
 import { Download, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import DatasetImage from "./DatasetImage";
 import { SeverityBadge } from "./ui";
 import { downloadImage } from "../lib/download";
+import { affectedDelta } from "../lib/testTrace";
 import { assetUrl, type ResolvedCase } from "../data/testCases";
 
-export default function ViolationCard({ tc, n }: { tc: ResolvedCase; n: number }) {
+const CONDITION: Record<string, string> = {
+  fog: "Fog", rain: "Rain", night: "Night", dusk: "Dusk", haze: "Haze", glare: "Lens glare",
+  motionblur: "Motion blur", occlusion: "Occlusion", brightness: "Brightness", rotate: "Rotation",
+  bgr: "Channel reorder", contrast: "Contrast", blur: "Blur", insert: "Object insertion",
+};
+
+const EFFECT: Record<string, string> = {
+  "confidence degradation": "Detection confidence fell below the decision threshold.",
+  "false negative": "The object was not detected.",
+  "object disappearance": "A previously detected object was lost.",
+  "class confusion": "The object was assigned the wrong class.",
+  "localisation degradation": "The bounding box degraded significantly.",
+};
+
+function Row({ k, children }: { k: string; children: ReactNode }) {
+  return (
+    <div className="grid grid-cols-[110px_1fr] gap-x-3 py-1.5">
+      <dt className="label pt-0.5">{k}</dt>
+      <dd className="text-[12.5px] leading-relaxed text-slate-300">{children}</dd>
+    </div>
+  );
+}
+
+export default function ViolationCard({ tc }: { tc: ResolvedCase; n?: number }) {
   if (!tc.failure) return null;
+  const d = affectedDelta(tc);
+  const cond = CONDITION[tc.transformStyle] ?? tc.transformName;
 
   return (
-    <div className="card card-pad border-fail/30">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-bold text-fail">VIOLATION #{String(n).padStart(2, "0")}</div>
+    <div className="card overflow-hidden border-fail/30">
+      <div className="flex items-center justify-between border-b hairline px-4 py-2.5">
+        <span className="text-[13px] font-semibold text-slate-100">
+          {cond} · {tc.failure.affectedClass}
+        </span>
         <SeverityBadge severity={tc.failure.severity} />
       </div>
 
-      <div className="mt-3 space-y-2">
-        <div className="overflow-hidden rounded-lg border border-base-700/50">
+      <div className="grid gap-2 p-3 sm:grid-cols-2">
+        <figure className="overflow-hidden rounded-md border hairline">
           <DatasetImage tc={tc} kind="original" />
-        </div>
-        <div className="overflow-hidden rounded-lg border border-fail/30">
+          <figcaption className="border-t hairline px-2 py-0.5 text-[10px] text-slate-500">Before</figcaption>
+        </figure>
+        <figure className="overflow-hidden rounded-md border border-fail/30">
           <DatasetImage tc={tc} kind="transformed" />
-        </div>
+          <figcaption className="border-t hairline px-2 py-0.5 text-[10px] text-slate-500">After · {tc.transformName}</figcaption>
+        </figure>
       </div>
 
-      <dl className="mono mt-3 grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-1 text-[12px]">
-        <div className="text-slate-500">Image</div>
-        <div className="text-slate-300">{tc.id} · {tc.mr.id}</div>
-        <div className="text-slate-500">MR</div>
-        <div className="text-slate-300">{tc.mr.name}</div>
-        <div className="text-slate-500">Affected class</div>
-        <div className="text-fail">{tc.failure.affectedClass}</div>
-        <div className="text-slate-500">Failure type</div>
-        <div className="text-slate-300">{tc.failure.category}</div>
-        <div className="text-slate-500">CLIP similarity</div>
-        <div className="text-slate-300">{(tc.clipScore * 100).toFixed(1)}%</div>
+      <dl className="divide-y hairline px-4 pb-2">
+        <Row k="Condition">{cond}</Row>
+        <Row k="Affected class">
+          <span className="text-fail">{tc.failure.affectedClass}</span>
+        </Row>
+        <Row k="Expected">{tc.mr.expected}</Row>
+        <Row k="Observed">
+          {d ? (
+            <>
+              {d.cls} confidence{" "}
+              <span className="mono">
+                {d.before.toFixed(2)} → {d.after.toFixed(2)}
+              </span>{" "}
+              <span className={`mono ${d.pct <= -25 ? "text-fail" : "text-warn"}`}>
+                ({d.pct.toFixed(0)}%)
+              </span>
+            </>
+          ) : (
+            tc.failure.observed
+          )}
+        </Row>
+        <Row k="Effect">{EFFECT[tc.failure.category] ?? tc.failure.category}</Row>
       </dl>
 
-      <p className="mt-3 text-xs leading-relaxed text-slate-300">{tc.failure.observed}</p>
-
-      <div className="mt-4 flex gap-2">
+      <div className="flex gap-2 border-t hairline px-4 py-3">
         <Link to={`/results?case=${tc.id}`} className="btn-ghost !py-1.5 !text-xs">
-          <Eye size={14} /> View details
+          <Eye size={13} /> Full trace
         </Link>
         <button
-          onClick={() => downloadImage(assetUrl(tc.transformedImage), `${tc.id}-${tc.transformStyle}-violation.jpg`)}
+          onClick={() => downloadImage(assetUrl(tc.transformedImage), `${tc.id}-${tc.transformStyle}.jpg`)}
           className="btn-ghost !py-1.5 !text-xs"
         >
-          <Download size={14} /> Save image
+          <Download size={13} /> Evidence image
         </button>
       </div>
     </div>

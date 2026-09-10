@@ -17,6 +17,14 @@ import { usePipeline } from "../hooks/useTestingPipeline";
 import { AnimatedNumber } from "../components/ui";
 import { BASE_MRS, GENERATED_MRS } from "../data/metamorphicRelations";
 import { conditionRobustness, summary } from "../lib/report";
+import { RELATION_STATS } from "../lib/relationStats";
+import WhyMetamorph from "../components/WhyMetamorph";
+import AgentLoop from "../components/AgentLoop";
+import TestTrace from "../components/TestTrace";
+import { RESOLVED_CASES } from "../data/testCases";
+
+const HERO_CASE = RESOLVED_CASES.find((c) => c.id === "IMG-07") ?? RESOLVED_CASES[0];
+const HERO_NUMBER = RESOLVED_CASES.findIndex((c) => c.id === HERO_CASE.id) + 1;
 
 const STRIP = [
   { icon: Images, label: "Source" },
@@ -281,7 +289,23 @@ export default function Dashboard() {
         />
       </div>
 
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-slate-500">
+        <span className="label">Relations</span>
+        <span className="text-slate-300">{RELATION_STATS.candidate} candidate</span>
+        <span className="text-slate-600">→</span>
+        <span className="text-slate-300">{RELATION_STATS.validated} validated</span>
+        <span className="text-slate-600">→</span>
+        <span className="text-slate-300">{RELATION_STATS.selected} selected</span>
+        <span className="text-slate-600">→</span>
+        <span className="text-slate-300">{RELATION_STATS.executed} executed</span>
+      </div>
+
       <PipelineStrip />
+
+      <div>
+        <div className="label mb-2">Featured test trace</div>
+        <TestTrace tc={HERO_CASE} caseNumber={HERO_NUMBER} defaultOpen />
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
         <div className="card card-pad">
@@ -322,6 +346,9 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      <WhyMetamorph />
+      <AgentLoop />
     </div>
   );
 }
