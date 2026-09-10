@@ -17,6 +17,22 @@ npm run build      # type-check + production build to dist/
 npm run preview    # serve the production build
 ```
 
+## Deploy (Vercel)
+
+Static Vite SPA (hash routing, no backend, no env vars). `vercel.json` sets the SPA
+fallback and long-cache headers; Vercel runs `vite build` → serves `dist/`.
+
+**CLI**
+```bash
+npm i -g vercel
+vercel          # first run: log in + link + accept the detected Vite settings
+vercel --prod   # production deploy
+```
+
+**GitHub → vercel.com** — push this repo, then *Add New → Project → Import*; the Vite
+preset auto-fills. Every push redeploys. Keep the repo private (it contains the draft
+FYP handbook PDF), or `git rm --cached BS-FYP-Handbook-2026_DRAFT.pdf` first.
+
 ## Demo flow (≈3–5 min)
 
 1. **Test Setup** — click *Upload Model*, *Upload Dataset*, then *Use example (autonomous driving)* → *Start Agentic Test*.
