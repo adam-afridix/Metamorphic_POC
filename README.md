@@ -5,6 +5,10 @@ Framework for Computer Vision Models. It demonstrates the full proposed workflow
 transformation → CLIP semantic validation → CV model → MR oracle → failure analysis → robustness
 report — using **deterministic mock services**. No ML/LLM backend, no API keys, no internet needed.
 
+**Themes:** two modes of one design system, switched from the header and persisted —
+`Dark` (computational / operational) and `Warm Lab` (analytical parchment / technical-editorial).
+All colours are CSS custom-property tokens in `src/index.css`; components never hard-code hex.
+
 ## Run
 
 ```bash
